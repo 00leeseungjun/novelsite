@@ -1,0 +1,34 @@
+<header class="header">
+    <div class="header-inner">
+        <span><a href="http://localhost:3000/main">로고</a></span>
+        <span>
+            <form action="/search" method="get" class="search-form">
+                <input type="text" name="q" placeholder="검색..." />
+            </form>
+        </span>
+
+        <% if (user) { %>
+        <!-- 🔥 모달을 열기 위한 버튼 -->
+        <div id="userMenuBtn" class="user-menu-btn">
+            <%= user.nickname %>님 ▾
+        </div>
+        <% } else { %>
+        <span><a href="/login">로그인</a></span>
+        <% } %>
+    </div>
+</header>
+
+<!-- 🔥 로그인 유저에게만 모달/오버레이 표시 -->
+<% if (user) { %>
+<div id="userMenuOverlay" class="user-menu-overlay hidden"></div>
+
+<div id="userMenuModal" class="user-menu-modal hidden">
+    <div class="user-menu-header">
+        <span class="user-menu-name"><%= user.nickname %></span>
+    </div>
+    <div class="user-menu-body">
+        <a href="/mynovel" class="user-menu-item">내 작품</a>
+        <a href="/logout" class="user-menu-item logout">로그아웃</a>
+    </div>
+</div>
+<% } %>

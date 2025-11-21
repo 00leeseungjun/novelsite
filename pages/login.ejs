@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="/login.css" />
+    </head>
+    <body>
+        <div>
+            <div class="login_wrap">
+                <div class="title">
+                    <h2><a href="http://localhost:3000/main">novelsite</a></h2>
+                </div>
+                <form method="post" action="/login">
+                    <input type="text" name="id" />
+                    <input type="password" name="password" />
+
+                    <div>
+                        <span>아이디찾기</span><span>|</span
+                        ><span>비밀번호 찾기</span>
+                    </div>
+
+                    <input type="submit" value="로그인" />
+
+                    <div>
+                        <span>아직 회원가입을 안했나요?</span>
+                        <span>
+                            <a href="http://localhost:3000/signup">
+                                회원가입하러 가기
+                            </a>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

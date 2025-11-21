@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>모든 소설</title>
+        <link rel="stylesheet" href="/allnovel.css">
+        <script src="/js/user-menu.js"></script>
+    </head>
+    <body>
+        <div>
+            <%- include('parts/header') %>
+
+            <div class="section-bar">
+                <span class="section-title">모든 소설</span>
+            </div>
+
+            <!-- {/* 카드 리스트 */} -->
+            <div class="novel-list">
+                <% for (const novel of novels) { %>
+                    <a href="/novel/<%= novel.novelId %>">
+                        <div class="novel-card">
+                            <div class="novel-image">소설 이미지</div>
+                            <div class="novel-title"><%= novel.title %></div>
+                            <div class="novel-author"><%= novel.nickname %></div>
+                        </div>
+                    </a>
+                <% } %>
+                
+            </div>
+
+            
+    </body>
+</html>

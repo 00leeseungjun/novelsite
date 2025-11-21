@@ -1,0 +1,62 @@
+[
+  {
+    "id": "seungjunwrites",
+    "email": "seungjunwrites@example.com",
+    "password": "1234",
+    "nickname": "이승준"
+  },
+  {
+    "id": "taewooStory",
+    "email": "taewooStory@example.com",
+    "password": "1234",
+    "nickname": "김태우"
+  },
+  {
+    "id": "seohyunBook",
+    "email": "seohyunBook@example.com",
+    "password": "1234",
+    "nickname": "박서현"
+  },
+  {
+    "id": "yundohyun",
+    "email": "yundohyun@example.com",
+    "password": "1234",
+    "nickname": "윤도현"
+  },
+  {
+    "id": "gracechoi",
+    "email": "gracechoi@example.com",
+    "password": "1234",
+    "nickname": "최은지"
+  },
+  {
+    "id": "jiwriter",
+    "email": "jiwriter@example.com",
+    "password": "1234",
+    "nickname": "한지원"
+  },
+  {
+    "id": "yuriReads",
+    "email": "yuriReads@example.com",
+    "password": "1234",
+    "nickname": "정유리"
+  },
+  {
+    "id": "jihoonNote",
+    "email": "jihoonNote@example.com",
+    "password": "1234",
+    "nickname": "오지훈"
+  },
+  {
+    "id": "sck07013",
+    "email": "testtest@naver.com",
+    "password": "$2b$10$sdglMsG3FAnbfkSHrvTNce04ZpPip3ByQfbdJ8wgrxXRPdri5kRm.",
+    "nickname": "이승준이승준"
+  },
+  {
+    "id": "sck070131",
+    "email": "tmdwns7834@daum.net",
+    "password": "$2b$10$RfPUqrSUuC8oaoqBHnxsGOtdmXREJ/mBzM6VJfao7XuXq6m54wP4W",
+    "nickname": "가나다"
+  }
+]

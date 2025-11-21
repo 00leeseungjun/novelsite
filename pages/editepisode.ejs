@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>에피소드 수정</title>
+    <!-- 기존 스타일링 파일을 사용한다고 가정합니다. -->
+    <link rel="stylesheet" href="/editnovel.css">
+    <style>
+        /* 에피소드 내용(textarea)이 더 넓게 보이도록 약간의 커스텀 스타일 추가 */
+        .novel-form textarea#content {
+            height: 400px;
+            min-height: 250px;
+            line-height: 1.8;
+            font-size: 16px;
+            /* 여백 추가로 가독성 향상 */
+            padding: 20px 25px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- 소설 제목을 페이지 제목에 포함하여 어떤 작품의 에피소드인지 명확히 표시 -->
+        <h1 class="page-title"><%= novelTitle %> - 에피소드 수정</h1>
+
+        <!-- 
+            액션 경로: /editnovel/:novelId/episode/:episodeId 
+        -->
+        <form 
+            action="/editepisode/<%= novelId %>/episode/<%= episode.episodeNumber %>" 
+            method="POST" 
+            class="novel-form"
+        >
+
+            <!-- 소설 ID와 에피소드 ID는 숨겨서 전달합니다. -->
+            <input type="hidden" name="novelId" value="<%= novelId %>">
+            <input type="hidden" name="episodeId" value="<%= episode.episodeId %>">
+
+            <!-- 에피소드 제목 -->
+            <div class="form-group">
+                <label for="title">에피소드 제목</label>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value="<%= episode.episodeTitle%>"
+                    required
+                >
+            </div>
+
+            <!-- 에피소드 내용 (내용이 길기 때문에 textarea 사용) -->
+            <div class="form-group">
+                <label for="content">에피소드 내용</label>
+                <textarea
+                    id="content"
+                    name="content"
+                    required
+                ><%= episode.content %></textarea>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="form-btns">
+                <!-- 취소 버튼 클릭 시 해당 소설의 에피소드 목록 페이지로 이동 -->
+                <a href="/novel/<%= novelId %>" class="btn-secondary">취소</a>
+                <button type="submit" class="btn-primary">수정하기</button>
+            </div>
+
+        </form>
+    </div>
+</body>
+</html>

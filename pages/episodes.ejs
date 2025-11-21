@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= episode.episodeTitle %></title>
+        <link rel="stylesheet" href="/episodes.css" />
+    </head>
+    <body>
+        <div class="content-section">
+            <!-- 상단 고정 영역 -->
+            <div class="content-top">
+                <div class="content-top-inner">
+                    <span>
+                        <a href="/novel/<%= novel.novelId %>">작품홈</a>
+                    </span>
+                    <span><%= episode.episodeTitle %></span>
+                </div>
+            </div>
+
+            <!-- 본문 -->
+            <div class="content">
+                <%- episode.content.replace(/\n/g, "<br />") %>
+            </div>
+
+            <!-- 하단 고정 네비게이션 -->
+            <div class="content-bottom">
+                <!-- 이전화 -->
+                <% if (prev) { %>
+                <a
+                    href="/novel/<%= novel.novelId %>/<%= prev %>"
+                    class="nav-btn"
+                >
+                    이전화
+                </a>
+                <% } else { %>
+                <span class="nav-btn disabled">이전화 없음</span>
+                <% } %>
+
+                <!-- 댓글 -->
+                <a
+                    href="/novel/<%= novel.novelId %>/<%= episode.episodeNumber %>/comments"
+                    class="nav-btn"
+                >
+                    댓글
+                </a>
+
+                <!-- 다음화 -->
+                <% if (next) { %>
+                <a
+                    href="/novel/<%= novel.novelId %>/<%= next %>"
+                    class="nav-btn"
+                >
+                    다음화
+                </a>
+                <% } else { %>
+                <span class="nav-btn disabled">다음화 없음</span>
+                <% } %>
+            </div>
+        </div>
+    </body>
+</html>

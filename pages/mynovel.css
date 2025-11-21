@@ -1,0 +1,283 @@
+/* ----------------------------------- */
+/* 나의 작품 관리 페이지 (mynovel.ejs) 스타일 - novel.css와 통일성 강화 */
+/* ----------------------------------- */
+
+.mynovel-main {
+    max-width: 1280px; /* index.css와 동일하게 최대 너비 설정 */
+    margin: 40px auto; /* 중앙 정렬 및 상단 여백 추가 */
+    padding: 0 16px 40px;
+}
+
+.mynovel-main h2 {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #222; 
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e3e3e3; 
+    padding-bottom: 10px;
+}
+
+.mynovel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+/* 작품 목록 컨테이너 */
+.novel-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px; 
+}
+
+/* 개별 작품 소개 섹션 */
+.novelintrosection {
+    display: flex;
+    gap: 18px; 
+    padding: 18px; 
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fafafa;
+    align-items: flex-start; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); 
+    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+/* .novelintrosection:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    border-color: #ccc;
+} */
+
+/* 작품 이미지 썸네일 */
+/* .novel-image-thumb,
+.novel-image {
+    width: 100px;
+    height: 140px; 
+    min-width: 100px;
+    border-radius: 8px; 
+    object-fit: cover;
+    background-color: #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    font-size: 0.8em;
+    flex-shrink: 0;
+} */
+
+.novel-image {
+    width: 160px;
+    height: 220px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #e5e5e5;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #777;
+}
+
+/* 작품 정보 영역 */
+.novel-intro {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.novel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0px;
+    line-height: 1.2;
+}
+
+.novel-title a {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #222;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.novel-title a:hover {
+    color: #007bff;
+}
+
+.novel-author {
+    color: #6c757d;
+    font-size: 0.9em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px; 
+}
+
+/* 연재 상태 및 좋아요 표시를 위한 메타 정보 섹션 */
+.novel-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-bottom: 8px;
+    margin-top: 4px;
+}
+
+.novel-likes {
+    font-weight: 600;
+    color: #ff4d4f;
+}
+
+/* 연재 상태를 시각화하는 배지 스타일 (novel.css 스타일 반영) */
+.novel-status-badge {
+    padding: 3px 10px;
+    border-radius: 999px; /* 둥근 뱃지 */
+    font-weight: 600;
+    font-size: 0.75em; 
+    border: 1px solid; 
+    display: inline-block;
+}
+
+/* 연재 중 상태 배지 */
+.status-ongoing {
+    background: #fff4f4;
+    border-color: #ffb6b6;
+    color: #c65252;
+}
+
+/* 완결 상태 배지 */
+.status-finished {
+    background: #f4fff4;
+    border-color: #b6ffb6;
+    color: #319b5c;
+}
+
+.novel-description-summary {
+    color: #555;
+    font-size: 0.95em;
+    line-height: 1.4;
+    max-height: 4.2em;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+/* ================================== */
+/* 🔑 수정된 부분: 관리/쓰기/삭제 버튼 스타일 (더 작고 깔끔하게) */
+/* ================================== */
+.action-write,
+.action-manage,
+.action-delete {
+    padding: 2px 7px; /* 패딩을 줄여서 크기 작게 */
+    border-radius: 6px; /* 둥근 정도 유지 */
+    font-size: 0.75em; /* 글자 크기 더 작게 */
+    text-decoration: none;
+    margin-left: 6px;
+    transition: background-color 0.2s, transform 0.1s;
+    font-weight: 600; 
+    white-space: nowrap; /* 버튼 내용이 줄바꿈되지 않도록 */
+    
+    /* 🌟 버튼 크기 통일 핵심 속성 */
+    display: inline-block; /* 너비 적용을 위해 블록 속성 추가 */
+    min-width: 70px; /* 최소 너비 설정 (이 값으로 버튼 크기를 통일) */
+    text-align: center; /* 텍스트 중앙 정렬 */
+}
+
+/* 쓰기 및 관리 버튼 스타일 (배경 검은색, 글자 흰색) */
+a.action-write,
+a.action-manage {
+    background-color: #111;
+    color: #fff; /* 특정성 강화를 통해 흰색 글자색을 보장 */
+}
+
+/* .action-write:hover {
+    background-color: #111;
+    transform: translateY(-0.5px);
+} */
+
+.action-manage {
+    background-color: #111;
+    color: #fff;
+}
+
+/* .action-manage:hover {
+    background-color: #1e7e34;
+    transform: translateY(-0.5px);
+} */
+
+.action-delete {
+    color: #dc3545;
+    background: none;
+    border: 1px solid #dc3545;
+    cursor: pointer;
+    /* display, min-width, text-align은 위 공통 스타일에서 적용됨 */
+}
+
+/* 삭제 버튼 호버 효과 */
+.action-delete:hover {
+    background-color: #dc3545;
+    color: #fff;
+    transform: translateY(-0.5px);
+}
+/* ================================== */
+
+
+/* 등록 작품이 없을 때 스타일 */
+.no-novels-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+}
+
+.no-novels-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.no-novels-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.no-novels-btn {
+    padding: 10px 18px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.no-novels-btn:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+/* 상단 새 작품 등록 버튼 */
+.btn-add-novel-small {
+    display: flex;
+    padding: 8px 15px;
+    background-color: #111; 
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px; 
+    font-weight: 600;
+    transition: background-color 0.2s, transform 0.2s;
+    height: 37.5px;
+    text-align: center;
+    align-items: center;
+}
+
+
+.btn-add-novel-small:hover {
+    background-color: #333;
+    transform: translateY(-1px);
+}

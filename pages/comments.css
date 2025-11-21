@@ -1,0 +1,417 @@
+/* .comment {
+    border: 1px solid black;
+    width: 100%;
+    height: 150px;
+}
+
+.comment-section {
+    margin: 80px auto 70px auto;
+    
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.comment-input {
+    width: 100%;
+    border: 1px solid black;
+    height: 150px;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+textarea {
+    width: 75%;
+    height: 143px;
+}
+
+button {
+    width: 25%;
+    height: 150px;
+}
+
+a {
+    text-decoration: none;
+} */
+
+
+/* body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #ffffff;
+            color: #111827;
+        }
+
+        .content-section {
+            max-width: 960px;
+            margin: 40px auto 80px auto;
+            padding: 0 24px;
+        }
+
+        .episode-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+
+        .comment-section.style-1 {
+            margin-top: 24px;
+        }
+
+        .comment-section.style-1 .comment-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .comment-section.style-1 .comment-header-left {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .comment-section.style-1 .comment-header-left span:first-child {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .comment-section.style-1 .comment-header-left span:last-child {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .comment-section.style-1 .comment-header-right {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .comment-section.style-1 .comment-header-right span {
+            margin-left: 16px;
+            cursor: pointer;
+        }
+
+        .comment-section.style-1 .comment-header-right .active {
+            font-weight: 600;
+            color: #111827;
+        }
+
+
+        .comment-section.style-1 .comment-input {
+            margin-top: 16px;
+            margin-bottom: 18px;
+        }
+
+        .comment-section.style-1 .comment-input-box {
+            width: 100%;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            background: #fafafa;
+            padding: 14px 20px;
+            font-size: 15px;
+            color: #9ca3af;
+        }
+
+        .comment-section.style-1 .comment-meta-row {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .comment-section.style-1 .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .comment-section.style-1 .chip-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #e5e7eb;
+        }
+
+
+        .comment-section.style-1 .comment-list {
+            margin-top: 24px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .comment-section.style-1 .comment-item {
+            padding: 18px 4px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .comment-section.style-1 .comment-left {
+            max-width: 80%;
+        }
+
+        .comment-section.style-1 .comment-nickname {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .comment-section.style-1 .comment-body {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 4px;
+        }
+
+        .comment-section.style-1 .comment-episode {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .comment-section.style-1 .comment-right {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .comment-section.style-1 .comment-actions {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comment-section.style-1 .comment-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            padding: 6px 10px;
+            font-size: 13px;
+            background: #f9fafb;
+            color: #6b7280;
+            cursor: pointer;
+        }
+
+        .comment-section.style-1 .comment-btn span.icon {
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .content-section {
+                padding: 0 16px;
+            }
+            .comment-section.style-1 .comment-item {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .comment-section.style-1 .comment-left {
+                max-width: 100%;
+            }
+            .comment-section.style-1 .comment-right {
+                text-align: left;
+            }
+        } */
+
+
+        /* ===== 기본 레이아웃 (에피소드 페이지 공통) ===== */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #ffffff;
+    color: #111827;
+}
+
+.content-section {
+    max-width: 960px;
+    margin: 40px auto 80px auto;
+    padding: 0 24px;
+}
+
+
+.content-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 16px;
+    color: #6b7280;
+}
+
+.content-top a {
+    text-decoration: none;
+    color: #111827;
+    font-weight: 500;
+}
+
+.episode-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 32px;
+}
+
+
+.content-bottom {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.content-bottom a {
+    text-decoration: none;
+    color: #111827;
+    font-weight: 500;
+}
+
+
+
+.comment-section.style-1 {
+    margin-top: 24px;
+}
+
+
+.comment-section.style-1 .comment-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.comment-section.style-1 .comment-header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.comment-section.style-1 .comment-header-left span:first-child {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.comment-section.style-1 .comment-header-left span:last-child {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.comment-section.style-1 .comment-header-right {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.comment-section.style-1 .comment-header-right span {
+    margin-left: 16px;
+    cursor: pointer;
+}
+
+.comment-section.style-1 .comment-header-right .active {
+    font-weight: 600;
+    color: #111827;
+}
+
+
+
+.comment-section.style-1 .comment-input {
+    margin-top: 16px;
+    margin-bottom: 18px;
+}
+
+.comment-section.style-1 .comment-input-box {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #fafafa;
+    padding: 14px 20px;
+    font-size: 15px;
+    color: #9ca3af;
+}
+
+.comment-section.style-1 .comment-meta-row {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.comment-section.style-1 .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.comment-section.style-1 .chip-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #e5e7eb;
+}
+
+
+.comment-section.style-1 .comment-list {
+    margin-top: 24px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.comment-section.style-1 .comment-item {
+    padding: 18px 4px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: sp
+}
+
+/* ===== 댓글 작성 폼 (로그인 상태) ===== */
+
+.comment-section.style-1 .comment-form {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    background: #fafafa;
+    padding: 12px 14px;
+    box-sizing: border-box;
+}
+
+.comment-section.style-1 .comment-form textarea {
+    width: 100%;
+    min-height: 80px;
+    border: none;
+    resize: vertical;
+    font-size: 14px;
+    outline: none;
+    padding: 4px 0;
+    background: transparent;
+}
+
+.comment-section.style-1 .comment-form-bottom {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comment-section.style-1 .comment-submit-btn {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: none;
+    background: #111827;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.comment-section.style-1 .comment-submit-btn:hover {
+    opacity: 0.95;
+}

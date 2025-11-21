@@ -1,0 +1,73 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="/index.css" />
+        <link rel="stylesheet" href="/write.css" />
+    </head>
+    <body>
+        <div>
+            
+            <h2>글쓰기</h2>
+            <form action="/write" method="POST">
+                <div class="write-section">
+                    <input type="text" class="episode-title" name="episodeTitle">
+                    <textarea name="content" id=""></textarea>
+                    <div class="write-button">
+                        <div><button type="submit">작성완료</button></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
+</html> -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>글쓰기</title>
+    <link rel="stylesheet" href="/index.css" />
+    <link rel="stylesheet" href="/addepisode.css" />
+    <script src="/js/user-menu.js"></script>
+</head>
+<body>
+
+    <%- include('parts/header') %>
+
+    <div class="page-container">
+        <h1 class="page-title">회차 작성 (Write Episode)</h1>
+
+        <form action="/addepisode?novel=<%= novelId %>" method="POST">
+
+            <!-- 회차 제목 -->
+            <div class="write-section">
+                
+                <input 
+                    type="text" 
+                    class="episode-title" 
+                    name="episodeTitle" 
+                    placeholder="회차 제목을 입력하세요"
+                    required
+                />
+
+                <textarea 
+                    name="content" 
+                    class="episode-content"
+                    placeholder="내용을 입력하세요..."
+                    required
+                ></textarea>
+
+                <!-- 버튼 -->
+                <div class="write-button">
+                    <button type="submit">작성 완료</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= novel.title %></title>
+        <link rel="stylesheet" href="/index.css" />
+        <link rel="stylesheet" href="/novel.css" />
+        <script src="/js/user-menu.js"></script>
+        <script src="/js/episode-sort.js"></script>
+        <script src="/js/likes.js"></script>
+    </head>
+    <body>
+        <div class="novel-page">
+            <%- include('parts/header') %>
+
+            <main class="novel-main">
+                <section class="novelintrosection">
+                    <div class="novel-image">
+                        <% if (novel.thumbnail) { %>
+                        <img
+                            src="<%= novel.thumbnail %>"
+                            alt="<%= novel.title %> 표지"
+                            class="novel-image-thumb"
+                        />
+                        <% } else { %>
+                        <div class="novel-image-placeholder">표지 이미지</div>
+                        <% } %>
+                    </div>
+
+                    <div class="novel-intro">
+                        <div class="novel-title"><%= novel.title %></div>
+
+                        <div class="novel-author">
+                            <a href="/writer/<%= novel.userId %>"
+                                ><%= novel.nickname %></a
+                            >
+                            
+                            <% if (isAuthor) { %>
+                                <a href="/editnovel?novel=<%= novel.novelId %>" class="author-action-btn">작품 정보 수정</a>
+                            <% } %>
+                            
+                        </div>
+
+                        <% if (novel.description) { %>
+                        <div class="novel-des"><%= novel.description %></div>
+                        <% } else { %>
+                        <div class="novel-des novel-des-empty">
+                            작품 소개가 아직 등록되지 않았습니다.
+                        </div>
+                        <% } %>
+
+                        <div class="novel-meta">
+                            <% if (novel.status) { %>
+                            <span class="badge status"
+                                ><%= novel.status %></span
+                            >
+                            <% } %> <% if (novel.genre) { %>
+                            <span class="badge genre"><%= novel.genre %></span>
+                            <% } %>
+                        </div>
+                        <section class="novel-action-section">
+                            <a
+                                href="/novel/<%= novel.novelId %>/1"
+                                class="first-episode-btn"
+                            >
+                                ▶ 첫 화 보기
+                            </a>
+
+                            <button id="likeBtn" class="like-btn" data-novel-id="<%= novel.novelId %>">
+                                ❤️ 관심 (<span id="likeCount"
+                                    ><%= novel.likes %></span
+                                >)
+                            </button>
+                        </section>
+                    </div>
+                </section>
+
+                <section class="episode-section">
+                    <div class="tab-section">
+                        <div class="tab active">회차</div>
+                        <div class="tab">1화부터</div>
+                    </div>
+
+                    <div class="episode-list">
+                        <% if (!episodes || episodes.length === 0) { %>
+                        <p class="episode-empty">등록된 회차가 없습니다.</p>
+                        <% } else { %> <% episodes.forEach(function(episode) { %>
+                        
+                        <div class="episode-item-wrap">
+                            <a
+                                class="episode-item"
+                                href="/novel/<%= novel.novelId %>/<%= episode.episodeNumber %>"
+                            >
+                                <span class="episode-number"
+                                    ><%= episode.episodeNumber %></span
+                                >
+                                <span class="episode-title"
+                                    ><%= episode.episodeTitle %></span
+                                >
+                            </a>
+                            <% if (isAuthor) { %>
+                                <div class="episode-actions">
+                                    <a href="/editepisode/<%= novel.novelId %>/episode/<%= episode.episodeNumber %>">
+                                        수정
+                                    </a>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <% }) %> <% } %>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </body>
+</html>

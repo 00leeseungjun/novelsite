@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= user?.nickname || '사용자' %>님의 작품 관리</title>
+        <link rel="stylesheet" href="/novel.css" />
+        <link rel="stylesheet" href="/index.css" />
+        <link rel="stylesheet" href="/mynovel.css" />
+        <script src="/js/user-menu.js"></script>
+    </head>
+    <body>
+        <div>
+            <%- include('parts/header') %>
+
+            <main class="mynovel-main">
+                <div class="mynovel-header">
+                    <h2>📚 <%= user?.nickname || '나의' %> 작품 관리</h2>
+                    <% if (novels.length > 0) { %>
+                    <!-- 작품이 있을 때만 버튼 표시 -->
+                    <a href="/addnovel" class="btn-add-novel-small">
+                        새 작품 등록
+                    </a>
+                    <% } %>
+                </div>
+
+                <% if (novels.length === 0) { %>
+                <div class="no-novels-container">
+                    <div class="no-novels-wrap">
+                        <p class="no-novels-text">
+                            아직 등록한 작품이 없습니다.
+                        </p>
+                        <a href="/addnovel" class="no-novels-btn">
+                            작품 등록하러 가기
+                        </a>
+                    </div>
+                </div>
+                <% } else { %>
+
+                <div class="novel-list-container">
+                    <% novels.forEach(novel => { %>
+                    <div class="novelintrosection">
+                        <% if (novel.imageUrl) { %>
+                        <img
+                            src="<%= novel.imageUrl %>"
+                            alt="<%= novel.title %> 이미지"
+                            class="novel-image-thumb"
+                        />
+                        <% } else { %>
+                        <div class="novel-image">소설 이미지</div>
+                        <% } %>
+
+                        <div class="novel-intro">
+                            <div class="novel-title">
+                                <a href="/novel/<%= novel.novelId %>"
+                                    ><%= novel.title %></a
+                                >
+                                <span>
+                                    <a
+                                        href="/addepisode?novel=<%= novel.novelId %>"
+                                        class="action-write"
+                                        >회차쓰기</a
+                                    >
+                                </span>
+                            </div>
+
+                            <div class="novel-author">
+                                <%= novel.nickname %>
+                                <span>
+                                    <a
+                                        href="/editnovel?novel=<%= novel.novelId %>"
+                                        class="action-manage"
+                                        >작품관리</a
+                                    >
+
+                                    <form
+                                        action="/deletenovel"
+                                        method="post"
+                                        class="delete-form"
+                                        style="display: inline-block"
+                                        onsubmit="return confirm('정말로 작품 [<%= novel.title %>]을(를) 영구 삭제하시겠습니까? 관련된 모든 회차, 댓글, 좋아요 데이터가 삭제됩니다.')"
+                                    >
+                                        <input
+                                            type="hidden"
+                                            name="novelId"
+                                            value="<%= novel.novelId %>"
+                                        />
+                                        <button
+                                            type="submit"
+                                            class="action-delete"
+                                            style="
+                                                cursor: pointer;
+                                                border: none;
+                                                background: none;
+                                                color: red;
+                                                padding: 0;
+                                            "
+                                        >
+                                            작품 삭제
+                                        </button>
+                                    </form>
+                                </span>
+                            </div>
+
+                            <div class="novel-intro status">
+                                연재 상태: <%= novel.status %>
+                                <span class="novel-likes"
+                                    >좋아요: <%= novel.likes || 0 %></span
+                                >
+                            </div>
+
+                            <div class="novel-description-summary">
+                                <%= novel.description.substring(0, 100) %>...
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                <% } %>
+            </main>
+        </div>
+    </body>
+</html>

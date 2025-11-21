@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <%- include("parts/header") %>
+
+    <main class="search-page">
+        <h2>"<%= q %>" 검색 결과</h2>
+
+        <% if (result.length === 0) { %>
+            <p>검색 결과가 없습니다.</p>
+        <% } else { %>
+            <div class="novel-list">
+                <% result.forEach(novel => { %>
+                    <a href="/novel/<%= novel.novelId %>">
+                        <div class="novel-card">
+                            <div class="novel-image"></div>
+                            <div class="novel-title"><%= novel.title %></div>
+                            <div class="novel-author"><%= novel.nickname %></div>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+        <% } %>
+
+    </main>
+</body>
+</html>

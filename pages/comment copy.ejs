@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>댓글 스타일 1</title>
+        <link rel="stylesheet" href="comment.css" />
+    </head>
+    <body>
+        <div class="content-section">
+            <div class="episode-title">신화급 마검 헌터 1화</div>
+
+            <div class="comment-section style-1">
+                <div class="comment-header">
+                    <div class="comment-header-left">
+                        <span>댓글</span><span>(1)</span>
+                    </div>
+                    <div class="comment-header-right">
+                        <span class="active">좋아요순</span>
+                        <span>최신순</span>
+                    </div>
+                </div>
+
+                <div class="comment-input">
+                    <% if (!user) { %>
+                    <!-- 로그인 안 한 상태 -->
+                    <div class="comment-input-box">
+                        로그인 후 댓글을 작성할 수 있습니다.
+                    </div>
+                    <div class="comment-meta-row">
+                        <div class="chip">
+                            <div class="chip-icon"></div>
+                            <span>스포일러 포함</span>
+                        </div>
+                    </div>
+                    <% } else { %>
+                    <!-- 로그인 한 상태: 실제 폼 -->
+                    <form
+                        class="comment-form"
+                        method="post"
+                        action="/novel/<%= episode.novelId %>/<%= episode.episodeNumber %>/comment"
+                    >
+                        <textarea
+                            name="content"
+                            placeholder="댓글 내용을 입력해 주세요."
+                        ></textarea>
+
+                        <div class="comment-form-bottom">
+                            <div class="comment-meta-row">
+                                <div class="chip">
+                                    <div class="chip-icon"></div>
+                                    <span>스포일러 포함</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="comment-submit-btn">
+                                댓글 등록
+                            </button>
+                        </div>
+                    </form>
+                    <% } %>
+                </div>
+
+                <div class="comment-list">
+                    <div class="comment-item">
+                        <div class="comment-left">
+                            <div class="comment-nickname">유소</div>
+                            <div class="comment-body">기대 됩니다</div>
+                            <div class="comment-episode">
+                                신화급 마검 헌터 1화
+                            </div>
+
+                            <div class="comment-actions">
+                                <button class="comment-btn">
+                                    <span class="icon">♡</span>
+                                    <span>좋아요</span>
+                                    <span>0</span>
+                                </button>
+                                <button class="comment-btn">
+                                    <span class="icon">💬</span>
+                                    <span>0</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="comment-right">2025.03.11</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

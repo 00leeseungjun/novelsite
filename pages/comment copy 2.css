@@ -1,0 +1,167 @@
+body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #ffffff;
+            color: #111827;
+        }
+
+        .content-section {
+            max-width: 960px;
+            margin: 40px auto 80px auto;
+            padding: 0 24px;
+        }
+
+        .episode-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        /* ----- 댓글 영역 전체 ----- */
+        .comment-section.style-2 {
+            margin-top: 16px;
+        }
+
+        .comment-section.style-2 .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .comment-section.style-2 .comment-count {
+            color: #ef4444;
+        }
+
+        /* ----- 입력창 카드 ----- */
+        .comment-section.style-2 .comment-input {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .comment-section.style-2 .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            background: #f9fafb;
+        }
+
+        .comment-section.style-2 .toolbar .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .comment-section.style-2 textarea {
+            width: 100%;
+            min-height: 80px;
+            border: none;
+            padding: 10px 12px;
+            outline: none;
+            resize: vertical;
+            font-size: 14px;
+        }
+
+        .comment-section.style-2 .submit-row {
+            display: flex;
+            justify-content: flex-end;
+            padding: 8px 10px 10px 10px;
+            background: #fafafa;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .comment-section.style-2 .submit-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background: #111827;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* ----- 댓글 리스트 ----- */
+        .comment-section.style-2 .comment-list {
+            margin-top: 12px;
+        }
+
+        .comment-section.style-2 .comment-item {
+            padding: 18px 4px 20px 4px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .comment-section.style-2 .comment-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .comment-section.style-2 .nickname {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .comment-section.style-2 .comment-date {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .comment-section.style-2 .comment-body {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .comment-section.style-2 .comment-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .comment-section.style-2 .comment-actions button {
+            border: none;
+            background: #f3f4f6;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+
+        .comment-section.style-2 .comment-actions button span.count {
+            margin-left: 4px;
+            color: #ef4444;
+        }
+
+        @media (max-width: 600px) {
+            .content-section {
+                padding: 0 16px;
+            }
+            .comment-section.style-2 .toolbar {
+                flex-wrap: wrap;
+            }
+            .comment-section.style-2 .submit-row {
+                justify-content: stretch;
+            }
+            .comment-section.style-2 .submit-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }

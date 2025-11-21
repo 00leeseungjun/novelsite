@@ -1,0 +1,100 @@
+/* ===== 페이지 전체 ===== */
+.page-container {
+    max-width: 720px;
+    margin: 50px auto;
+    padding: 40px 30px 60px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.page-title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #111;
+}
+
+/* ===== Form ===== */
+.novel-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    outline: none;
+    transition: 0.15s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #111;
+    background: #fff;
+}
+
+textarea {
+    height: 160px;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+/* ===== Buttons ===== */
+.form-btns {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.15s;
+}
+
+.btn-primary {
+    background: #111;
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #e5e5e5;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d5d5d5;
+    transform: translateY(-2px);
+}

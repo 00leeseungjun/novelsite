@@ -1,0 +1,207 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="/content.css" />
+        <link rel="stylesheet" href="/comment.css">
+    </head>
+    <body>
+        <div class="content-section">
+            <div class="content-top"><span><a href="./novel.html">작품홈</a></span><span>회차제목</span></div>
+            <div class="comment-section">
+                <div class="comment-input">
+                    <textarea aria-placeholder="댓글내용을 쓰세요"></textarea>
+                    <button>등록</button>
+                </div>
+                <div class="comment">
+                    <div>닉네임</div>
+                    <div>댓글내용</div>
+                </div>
+                <div class="comment">
+                    <div>닉네임</div>
+                    <div>댓글내용</div>
+                </div>
+                <div class="comment">
+                    <div>닉네임</div>
+                    <div>댓글내용</div>
+                </div>
+                <div class="comment">
+                    <div>닉네임</div>
+                    <div>댓글내용</div>
+                </div>
+                <div class="comment">
+                    <div>닉네임</div>
+                    <div>댓글내용</div>
+                </div>
+                <div class="comment">
+                    <div>닉네임</div>
+                    <div>댓글내용</div>
+                </div>
+                <div class="comment">
+                    <div>닉네임</div>
+                    <div>댓글내용</div>
+                </div>
+            </div>
+            <div class="content-bottom">
+                <span>이전화</span>
+                <span>댓글</span>
+                <span>다음화</span>
+            </div>
+        </div>
+    </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= novel.title %> <%= episode.episodeNumber %>화</title>
+        <link rel="stylesheet" href="/content.css" />
+        <link rel="stylesheet" href="/comments.css" />
+        
+    </head>
+    <body>
+        <div class="content-section">
+            <!-- 상단: 작품 홈 / 회차 제목 -->
+            <div class="content-top">
+                <!-- ✅ 작품홈으로 이동: novelId 사용 -->
+                <span>
+                    <a href="/novel/<%= novel.novelId %>">작품홈</a>
+                </span>
+
+                <!-- ✅ 회차 제목: episode 데이터 사용 -->
+                <span><%= episode.episodeTitle %></span>
+            </div>
+
+            <!-- (선택) 작품 제목 + 회차번호 표시 -->
+            <div class="episode-title">
+                <%= novel.title %> <%= episode.episodeNumber %>화
+            </div>
+
+            <!-- 댓글 영역 -->
+            <div class="comment-section style-1" id="comments">
+                <div class="comment-header">
+                    <div class="comment-header-left">
+                        <span>댓글</span>
+                        <!-- ✅ 댓글 개수: comments.length -->
+                        <span>(<%= comments.length %>)</span>
+                    </div>
+                    <div class="comment-header-right">
+                        <span class="active">최신순</span>
+                        <span>좋아요순</span>
+                    </div>
+                </div>
+                <div class="comment-input">
+                    <% if (!user) { %>
+                    <!-- 로그인 안 한 상태 -->
+                    <div class="comment-input-box">
+                        로그인 후 댓글을 작성할 수 있습니다.
+                    </div>
+                    <div class="comment-meta-row">
+                        <div class="chip">
+                            <div class="chip-icon"></div>
+                            <span>스포일러 포함</span>
+                        </div>
+                    </div>
+                    <% } else { %>
+                    <!-- 로그인 한 상태: 실제 폼 -->
+                    <form
+                        class="comment-form"
+                        method="post"
+                        action="/novel/<%= episode.novelId %>/<%= episode.episodeNumber %>/comment"
+                    >
+                        <textarea
+                            name="content"
+                            placeholder="댓글 내용을 입력해 주세요."
+                        ></textarea>
+
+                        <div class="comment-form-bottom">
+                            <div class="comment-meta-row">
+                                <div class="chip">
+                                    <div class="chip-icon"></div>
+                                    <span>스포일러 포함</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="comment-submit-btn">
+                                댓글 등록
+                            </button>
+                        </div>
+                    </form>
+                    <% } %>
+                </div>
+
+
+                <!-- ✅ 댓글 리스트: comments 배열 루프 -->
+                <div class="comment-list">
+                    <% if (comments.length === 0) { %>
+                    <div class="comment-item">
+                        <div class="comment-left">
+                            <div class="comment-body">
+                                아직 등록된 댓글이 없습니다.
+                            </div>
+                        </div>
+                    </div>
+                    <% } else { %> <% comments.forEach(function(c) { %>
+                    <div class="comment-item">
+                        <div class="comment-left">
+                            <!-- 닉네임 -->
+                            <div class="comment-nickname">
+                                <%= c.nickname %>
+                            </div>
+                            <!-- 댓글 내용 -->
+                            <div class="comment-body"><%= c.content %></div>
+                            <!-- 어떤 회차인지 표시 -->
+                            <div class="comment-episode">
+                                <%= novel.title %> <%= episode.episodeNumber
+                                %>화
+                            </div>
+
+                            <div class="comment-actions">
+                                <button class="comment-btn">
+                                    <span class="icon">♡</span>
+                                    <span>좋아요</span>
+                                    <span><%= c.likes || 0 %></span>
+                                </button>
+                                <button class="comment-btn">
+                                    <span class="icon">💬</span>
+                                    <span>0</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 작성 날짜 -->
+                        <div class="comment-right">
+                            <%= c.createdAt ? c.createdAt.slice(0, 10) : '' %>
+                        </div>
+                    </div>
+                    <% }) %> <% } %>
+                </div>
+            </div>
+
+            <!-- 아래: 이전화 / 댓글 / 다음화 -->
+            <div class="content-bottom">
+                <!-- ✅ 이전화: 같은 novelId, 회차 - 1 -->
+                <span>
+                    <a
+                        href="/novel/<%= novel.novelId %>/<%= episode.episodeNumber - 1 %>"
+                    >
+                        이전화
+                    </a>
+                </span>
+
+                <span><a href="#comments">댓글</a></span>
+
+                <!-- ✅ 다음화: 같은 novelId, 회차 + 1 -->
+                <span>
+                    <a
+                        href="/novel/<%= novel.novelId %>/<%= episode.episodeNumber + 1 %>"
+                    >
+                        다음화
+                    </a>
+                </span>
+            </div>
+        </div>
+    </body>
+</html>

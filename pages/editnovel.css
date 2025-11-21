@@ -1,0 +1,125 @@
+/* ===== 페이지 전체 ===== */
+.page-container {
+    max-width: 720px;
+    margin: 50px auto;
+    padding: 40px 30px 60px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.page-title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #111;
+}
+
+/* ===== Form ===== */
+.novel-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* .form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    outline: none;
+    transition: 0.15s ease;
+    box-sizing: border-box
+} */
+
+.novel-form input[type="text"],
+.novel-form textarea,
+.novel-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box; 
+    font-size: 1em;
+    font-family: inherit; /* 🔑 폰트 상속: 폰트가 튀는 것을 방지 */
+    background-color: #fff; /* 🔑 배경색 지정: OS 기본 스타일 제거 */
+    /* 🔑 드롭다운 화살표 스타일 (크롬/엣지): 기본 화살표를 숨기고 커스텀 스타일링 가능 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* 🔑 커스텀 화살표 추가를 위한 배경 이미지 (Base64 SVG 사용) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23343a40'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1.2em; /* 화살표 크기 */
+    padding-right: 35px; /* 화살표 공간 확보 */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #111;
+    background: #fff;
+}
+
+textarea {
+    height: 160px;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+/* 버튼 */
+.form-btns {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.15s;
+}
+
+.btn-primary {
+    background: #111;
+    color: #fff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #e5e5e5;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d5d5d5;
+    transform: translateY(-2px);
+}

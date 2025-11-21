@@ -1,0 +1,122 @@
+/* 전체 글꼴 / 배경 */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    line-height: 1.6;
+}
+
+/* 레이아웃 부모 */
+.content-section {
+    width: 100%;
+}
+
+/* =============================== */
+/* 🔽 상단 고정 헤더 */
+/* =============================== */
+.content-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    color: #000;
+    padding: 15px;
+    box-sizing: border-box;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    border-bottom: 1px solid #ddd;
+    
+    display: flex;
+    justify-content: center;  /* 🔥 추가 */
+}
+
+.content-top a {
+    color: #000;
+    text-decoration: none;
+}
+
+.content-top span {
+    flex: 1;
+}
+
+/* =============================== */
+/* 🔽 본문 내용 */
+/* =============================== */
+.content {
+    width: 75%;
+    max-width: 900px;
+
+    background-color: #f3f3f3;
+    margin: 80px auto 80px auto; /* top/bottom 여백 (고정바 공간 확보) */
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* =============================== */
+/* 🔽 하단 고정 버튼 영역 */
+/* =============================== */
+.content-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    padding: 12px 0;
+    border-top: 1px solid #ddd;
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+
+    z-index: 1000;
+}
+
+/* 버튼 스타일 공통 */
+.nav-btn {
+    color: #111;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* hover 효과 */
+.nav-btn:hover {
+    background: #f2f2f2;
+}
+
+/* 비활성 버튼 */
+.disabled {
+    color: #bbb !important;
+    cursor: not-allowed;
+}
+
+/* =============================== */
+/* 🔽 모바일 최적화 */
+/* =============================== */
+@media (max-width: 600px) {
+    .content {
+        width: 90%;
+        margin: 70px auto 70px auto;
+        padding: 16px;
+    }
+
+    .content-bottom {
+        gap: 20px;
+        padding: 10px 0;
+    }
+
+    .nav-btn {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+}

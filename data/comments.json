@@ -1,0 +1,68 @@
+[
+  {
+    "id": "c_001",
+    "novelId": "novel_001",
+    "episodeNumber": 1,
+    "userId": "seungjunwrites",
+    "nickname": "이승준",
+    "content": "기대 됩니다",
+    "likes": 0,
+    "parentId": null,
+    "createdAt": "2025-11-14T12:34:56.000Z"
+  },
+  {
+    "id": "c_002",
+    "novelId": "novel_001",
+    "episodeNumber": 1,
+    "userId": "taewooStory",
+    "nickname": "김태우",
+    "content": "재밌네요!",
+    "likes": 3,
+    "parentId": null,
+    "createdAt": "2025-11-14T13:00:00.000Z"
+  },
+  {
+    "id": "b6e94f2e-ce1e-4a4a-9b7a-95e628dfd24e",
+    "novelId": "novel_006",
+    "episodeNumber": 1,
+    "userId": "sck07013",
+    "nickname": "이승준이승준",
+    "content": "기대가 됩니다",
+    "likes": 0,
+    "parentId": null,
+    "createdAt": "2025-11-15T02:07:50.712Z"
+  },
+  {
+    "id": "b2909020-16e7-44a3-a477-40e52e684a70",
+    "novelId": "novel_006",
+    "episodeNumber": 1,
+    "userId": "sck07013",
+    "nickname": "이승준이승준",
+    "content": "",
+    "likes": 0,
+    "parentId": null,
+    "createdAt": "2025-11-16T04:09:50.361Z"
+  },
+  {
+    "id": "5ab9be75-69cd-437b-afe7-8988366ff383",
+    "novelId": "novel_004",
+    "episodeNumber": 5,
+    "userId": "sck07013",
+    "nickname": "이승준이승준",
+    "content": "굿굿굿",
+    "likes": 0,
+    "parentId": null,
+    "createdAt": "2025-11-19T06:43:09.862Z"
+  },
+  {
+    "id": "b1dcefcd-cd67-4829-a0bf-fd0c8804b317",
+    "novelId": "a8faeed3-681c-4cbd-99bb-5f0c17605bba",
+    "episodeNumber": 1,
+    "userId": "sck07013",
+    "nickname": "이승준이승준",
+    "content": "가나다",
+    "likes": 0,
+    "parentId": null,
+    "createdAt": "2025-11-20T03:59:16.847Z"
+  }
+]
