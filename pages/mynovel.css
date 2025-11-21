@@ -171,9 +171,9 @@
 .action-write,
 .action-manage,
 .action-delete {
-    padding: 2px 7px; /* 패딩을 줄여서 크기 작게 */
+    padding: 7px 7px; /* 패딩을 줄여서 크기 작게 */
     border-radius: 6px; /* 둥근 정도 유지 */
-    font-size: 0.75em; /* 글자 크기 더 작게 */
+    font-size: 18px; /* 글자 크기 더 작게 */
     text-decoration: none;
     margin-left: 6px;
     transition: background-color 0.2s, transform 0.1s;
@@ -184,6 +184,7 @@
     display: inline-block; /* 너비 적용을 위해 블록 속성 추가 */
     min-width: 70px; /* 최소 너비 설정 (이 값으로 버튼 크기를 통일) */
     text-align: center; /* 텍스트 중앙 정렬 */
+    height: 25px;
 }
 
 /* 쓰기 및 관리 버튼 스타일 (배경 검은색, 글자 흰색) */
@@ -191,6 +192,7 @@ a.action-write,
 a.action-manage {
     background-color: #111;
     color: #fff; /* 특정성 강화를 통해 흰색 글자색을 보장 */
+    margin-bottom: 10px;
 }
 
 /* .action-write:hover {
@@ -280,4 +282,9 @@ a.action-manage {
 .btn-add-novel-small:hover {
     background-color: #333;
     transform: translateY(-1px);
+}
+
+.novel-manage-section {
+    display: flex;
+    flex-direction: column;
 }

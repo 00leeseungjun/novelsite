@@ -55,51 +55,10 @@
                                 <a href="/novel/<%= novel.novelId %>"
                                     ><%= novel.title %></a
                                 >
-                                <span>
-                                    <a
-                                        href="/addepisode?novel=<%= novel.novelId %>"
-                                        class="action-write"
-                                        >회차쓰기</a
-                                    >
-                                </span>
                             </div>
 
                             <div class="novel-author">
                                 <%= novel.nickname %>
-                                <span>
-                                    <a
-                                        href="/editnovel?novel=<%= novel.novelId %>"
-                                        class="action-manage"
-                                        >작품관리</a
-                                    >
-
-                                    <form
-                                        action="/deletenovel"
-                                        method="post"
-                                        class="delete-form"
-                                        style="display: inline-block"
-                                        onsubmit="return confirm('정말로 작품 [<%= novel.title %>]을(를) 영구 삭제하시겠습니까? 관련된 모든 회차, 댓글, 좋아요 데이터가 삭제됩니다.')"
-                                    >
-                                        <input
-                                            type="hidden"
-                                            name="novelId"
-                                            value="<%= novel.novelId %>"
-                                        />
-                                        <button
-                                            type="submit"
-                                            class="action-delete"
-                                            style="
-                                                cursor: pointer;
-                                                border: none;
-                                                background: none;
-                                                color: red;
-                                                padding: 0;
-                                            "
-                                        >
-                                            작품 삭제
-                                        </button>
-                                    </form>
-                                </span>
                             </div>
 
                             <div class="novel-intro status">
@@ -112,6 +71,44 @@
                             <div class="novel-description-summary">
                                 <%= novel.description.substring(0, 100) %>...
                             </div>
+                        </div>
+                        <div class="novel-manage-section">
+                            <a
+                                href="/addepisode?novel=<%= novel.novelId %>"
+                                class="action-write"
+                                >회차쓰기</a
+                            >
+                            <a
+                                href="/editnovel?novel=<%= novel.novelId %>"
+                                class="action-manage"
+                                >작품관리</a
+                            >
+                            <form
+                                action="/deletenovel"
+                                method="post"
+                                class="delete-form"
+                                style="display: inline-block"
+                                onsubmit="return confirm('정말로 작품 [<%= novel.title %>]을(를) 영구 삭제하시겠습니까? 관련된 모든 회차, 댓글, 좋아요 데이터가 삭제됩니다.')"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="novelId"
+                                    value="<%= novel.novelId %>"
+                                />
+                                <button
+                                    type="submit"
+                                    class="action-delete"
+                                    style="
+                                        cursor: pointer;
+                                        border: none;
+                                        background: none;
+                                        color: red;
+                                        padding: 0;
+                                    "
+                                >
+                                    작품 삭제
+                                </button>
+                            </form>
                         </div>
                     </div>
                     <% }); %>
