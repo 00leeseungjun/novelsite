@@ -1,93 +1,122 @@
 [
-  {
-    "id": "1",
-    "title": "달빛 아래의 약속",
-    "userId": "seungjunwrites",
-    "nickname": "이승준",
-    "status": "연재중",
-    "novelId": "novel_001",
-    "likes": 1,
-    "description": "달빛이 비추는 밤마다 되살아나는 잊힌 약속. 두 사람의 과거와 운명이 다시 움직이기 시작한다."
-  },
-  {
-    "id": "2",
-    "title": "시간을 걷는 소녀",
-    "userId": "taewooStory",
-    "nickname": "김태우",
-    "status": "완결",
-    "novelId": "novel_002",
-    "likes": 1,
-    "description": "시간을 거슬러 진실을 찾는 소녀의 여정. 과거를 바꿀 것인가, 받아들일 것인가."
-  },
-  {
-    "id": "3",
-    "title": "검은별의 주인",
-    "userId": "seohyunBook",
-    "nickname": "박서현",
-    "status": "연재중",
-    "novelId": "novel_003",
-    "likes": 0,
-    "description": "빛조차 삼켜버리는 검은별. 그 별을 지배한 자가 세계의 판도를 흔든다."
-  },
-  {
-    "id": "4",
-    "novelId": "novel_004",
-    "title": "마법사의 유언",
-    "userId": "yundohyun",
-    "nickname": "윤도현",
-    "status": "연재중",
-    "likes": 0,
-    "description": "세상을 구한 대마법사의 마지막 말. 그 유언을 쫓는 소년의 운명이 펼쳐진다."
-  },
-  {
-    "id": "5",
-    "novelId": "novel_005",
-    "title": "사라진 왕국의 후예",
-    "userId": "gracechoi",
-    "nickname": "최은지",
-    "status": "완결",
-    "likes": 0,
-    "description": "역사에서 지워진 왕국. 그 후예가 다시 나타나며 세계의 균형이 흔들린다."
-  },
-  {
-    "id": "6",
-    "novelId": "novel_006",
-    "title": "차원의 문을 연 소년",
-    "userId": "jiwriter",
-    "nickname": "한지원",
-    "status": "연재중",
-    "likes": 0,
-    "description": "우연히 차원의 문을 연 소년. 낯선 세계에서의 모험이 시작된다."
-  },
-  {
-    "id": "7",
-    "novelId": "novel_007",
-    "title": "AI의 심장을 가진 소녀",
-    "userId": "yuriReads",
-    "nickname": "정유리",
-    "status": "연재중",
-    "likes": 0,
-    "description": "감정을 배우는 AI 소녀와 그녀를 지키려는 인간. 그들의 특별한 성장과 선택."
-  },
-  {
-    "id": "8",
-    "novelId": "novel_008",
-    "title": "그림자 정원",
-    "userId": "jihoonNote",
-    "nickname": "오지훈",
-    "status": "완결",
-    "likes": 0,
-    "description": "빛이 닿지 않는 정원, 그림자 속에 숨겨진 비밀을 파헤치는 이야기."
-  },
-  {
-    "id": "6ff2b694-191a-4a18-b846-6d523bb85116",
-    "novelId": "a8faeed3-681c-4cbd-99bb-5f0c17605bba",
-    "title": "테스트1",
-    "description": "테스트1",
-    "nickname": "이승준이승준",
-    "userId": "sck07013",
-    "status": "연재 중",
-    "likes": 1,
-    "coverImageUrl": "/uploads/coverImage-1763564083081-473000229.jpg"
-  }
+    {
+        "id": "1",
+        "title": "달빛 아래의 약속",
+        "userId": "seungjunwrites",
+        "nickname": "이승준",
+        "status": "연재중",
+        "novelId": "novel_001",
+        "likes": 1,
+        "description": "달빛이 비추는 밤마다 되살아나는 잊힌 약속. 두 사람의 과거와 운명이 다시 움직이기 시작한다.",
+        "genre": "로맨스",
+        "coverImageUrl": "https://placehold.co/160x220/f9a8d4/3b0764?text=로맨스"
+    },
+    {
+        "id": "2",
+        "title": "시간을 걷는 소녀",
+        "userId": "taewooStory",
+        "nickname": "김태우",
+        "status": "완결",
+        "novelId": "novel_002",
+        "likes": 1,
+        "description": "시간을 거슬러 진실을 찾는 소녀의 여정. 과거를 바꿀 것인가, 받아들일 것인가.",
+        "genre": "SF",
+        "coverImageUrl": "https://placehold.co/160x220/bae6fd/0c4a6e?text=SF"
+    },
+    {
+        "id": "3",
+        "title": "검은별의 주인",
+        "userId": "seohyunBook",
+        "nickname": "박서현",
+        "status": "연재중",
+        "novelId": "novel_003",
+        "likes": 0,
+        "description": "빛조차 삼켜버리는 검은별. 그 별을 지배한 자가 세계의 판도를 흔든다.",
+        "genre": "판타지",
+        "coverImageUrl": "https://placehold.co/160x220/a78bfa/390b79?text=판타지"
+    },
+    {
+        "id": "4",
+        "novelId": "novel_004",
+        "title": "마법사의 유언",
+        "userId": "yundohyun",
+        "nickname": "윤도현",
+        "status": "연재중",
+        "likes": 0,
+        "description": "세상을 구한 대마법사의 마지막 말. 그 유언을 쫓는 소년의 운명이 펼쳐진다.",
+        "genre": "판타지",
+        "coverImageUrl": "https://placehold.co/160x220/a78bfa/390b79?text=판타지"
+    },
+    {
+        "id": "5",
+        "novelId": "novel_005",
+        "title": "사라진 왕국의 후예",
+        "userId": "gracechoi",
+        "nickname": "최은지",
+        "status": "완결",
+        "likes": 0,
+        "description": "역사에서 지워진 왕국. 그 후예가 다시 나타나며 세계의 균형이 흔들린다.",
+        "genre": "현판",
+        "coverImageUrl": "https://placehold.co/160x220/fcd34d/78350f?text=현판"
+    },
+    {
+        "id": "6",
+        "novelId": "novel_006",
+        "title": "차원의 문을 연 소년",
+        "userId": "jiwriter",
+        "nickname": "한지원",
+        "status": "연재중",
+        "likes": 0,
+        "description": "우연히 차원의 문을 연 소년. 낯선 세계에서의 모험이 시작된다.",
+        "genre": "무협",
+        "coverImageUrl": "https://placehold.co/160x220/bbf7d0/065f46?text=무협"
+    },
+    {
+        "id": "7",
+        "novelId": "novel_007",
+        "title": "AI의 심장을 가진 소녀",
+        "userId": "yuriReads",
+        "nickname": "정유리",
+        "status": "연재중",
+        "likes": 0,
+        "description": "감정을 배우는 AI 소녀와 그녀를 지키려는 인간. 그들의 특별한 성장과 선택.",
+        "genre": "미스터리",
+        "coverImageUrl": "https://placehold.co/160x220/8b5cf6/f8f8ff?text=미스터리"
+    },
+    {
+        "id": "8",
+        "novelId": "novel_008",
+        "title": "그림자 정원",
+        "userId": "jihoonNote",
+        "nickname": "오지훈",
+        "status": "완결",
+        "likes": 0,
+        "description": "빛이 닿지 않는 정원, 그림자 속에 숨겨진 비밀을 파헤치는 이야기.",
+        "genre": "미스터리",
+        "coverImageUrl": "https://placehold.co/160x220/8b5cf6/f8f8ff?text=미스터리"
+    },
+    {
+        "id": "6ff2b694-191a-4a18-b846-6d523bb85116",
+        "novelId": "a8faeed3-681c-4cbd-99bb-5f0c17605bba",
+        "title": "테스트1",
+        "description": "테스트1",
+        "nickname": "이승준이승준",
+        "userId": "sck07013",
+        "status": "연재 중",
+        "likes": 1,
+        "coverImageUrl": "/uploads/coverImage-1763564083081-473000229.jpg",
+        "genre": "기타"
+    },
+    {
+        "id": "86e38766-4d3f-4b5d-927d-ecf66a6a41ff",
+        "novelId": "3c3803cf-7cf4-4712-92f5-88bc53614962",
+        "title": "판타지",
+        "description": "판타지 작품",
+        "genre": "판타지",
+        "nickname": "이승준이승준",
+        "userId": "sck07013",
+        "status": "연재중",
+        "likes": 0,
+        "coverImageUrl": "https://placehold.co/160x220/e5e5e5/777?text=NO+IMAGE"
+    }
 ]

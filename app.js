@@ -1060,24 +1060,29 @@ app.get("/addnovel", requireLogin, (req, res) => {
 // });
 
 app.post("/addnovel", requireLogin, upload.single("novelCover"), (req, res) => {
-    const { title, description } = req.body;
+    // 1. req.body에서 title, description, 그리고 새로 추가할 genre를 가져옵니다.
+    const { title, description, genre } = req.body; 
 
     const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8")); // 🔥 커버 이미지 경로 설정
+    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8")); 
+
+    // 커버 이미지 경로 설정
     const coverImageUrl = req.file
         ? `/uploads/${req.file.filename}`
-        : "https://placehold.co/160x220/e5e5e5/777?text=NO+IMAGE"; // 파일 없을 때 기본 이미지
+        : "https://placehold.co/160x220/e5e5e5/777?text=NO+IMAGE"; 
 
     const newNovel = {
         id: uuid.v4(),
         novelId: uuid.v4(),
         title,
         description,
+        // 2. 장르(genre) 필드를 새 소설 객체에 추가합니다.
+        genre, 
         nickname: req.session.user.nickname,
         userId: req.session.user.id,
         status: "연재중",
         likes: 0,
-        coverImageUrl, // NEW: 커버 이미지 URL 추가
+        coverImageUrl, 
     };
 
     novels.push(newNovel);

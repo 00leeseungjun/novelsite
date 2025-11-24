@@ -13,7 +13,29 @@
         <div class="page-container">
             <h1 class="page-title">작품 등록 (Create New Novel)</h1>
 
-            <form action="/addnovel" method="POST" class="novel-form">
+            <!-- 
+                ************************************************************
+                * [필수 수정] 파일 업로드를 위해 enctype="multipart/form-data" 추가 *
+                ************************************************************
+            -->
+            <form action="/addnovel" method="POST" class="novel-form" enctype="multipart/form-data">
+                
+                <!-- 
+                    ******************************************************************
+                    * [추가] 작품 표지 업로드 필드 (라우터의 upload.single("novelCover")와 매칭) *
+                    ******************************************************************
+                -->
+                <div class="form-group image-upload-group">
+                    <label for="novelCover">작품 표지 (선택 사항)</label>
+                    <input 
+                        type="file" 
+                        id="novelCover" 
+                        name="novelCover" 
+                        accept="image/*"
+                    />
+                    <small class="help-text">JPG, PNG만 가능합니다.</small>
+                </div>
+
                 <!-- 제목 -->
                 <div class="form-group">
                     <label for="title">작품 제목</label>
@@ -26,6 +48,29 @@
                     />
                 </div>
 
+                <!-- 
+                    **************************************************
+                    * [추가] 장르 선택 필드 (name="genre"로 데이터 전송) *
+                    **************************************************
+                -->
+                <div class="form-group">
+                    <label for="genre">장르 선택</label>
+                    <select id="genre" name="genre" required>
+                        <option value="" disabled selected>장르를 선택하세요</option>
+                        <option value="로맨스">로맨스</option>
+                        <option value="판타지">판타지</option>
+                        <option value="현판">현대 판타지</option>
+                        <option value="무협">무협</option>
+                        <option value="미스터리">미스터리</option>
+                        <option value="SF">SF</option>
+                        <option value="스포츠">스포츠</option>
+                        <option value="대역">대체역사</option>
+                        <option value="패러디">패러디</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+
+
                 <!-- 소개 -->
                 <div class="form-group">
                     <label for="description">작품 소개</label>
@@ -33,6 +78,7 @@
                         id="description"
                         name="description"
                         placeholder="작품 소개를 간단히 입력하세요"
+                        required
                     ></textarea>
                 </div>
 
