@@ -933,6 +933,9 @@ app.get("/editnovel", requireLogin, (req, res) => {
 //     res.redirect("/mynovel");
 // });
 
+
+// ... (multer, requireLogin 등 다른 미들웨어는 여기에 있다고 가정)
+
 app.post(
     "/editnovel/:novelId",
     requireLogin,
@@ -940,63 +943,94 @@ app.post(
     (req, res) => {
         // novelId를 URL 파라미터에서 가져옵니다.
         const novelId = req.params.novelId;
-        const { title, description, status } = req.body; // status 추가
+        // ⭐ 장르(genre) 필드를 추가로 가져옵니다.
+        const { title, description, status, genre } = req.body; 
+
+        // 작품 데이터 파일 경로
         const novelPath = path.join(__dirname, "data", "novels.json");
-        const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
+        
+        // ⭐ 핵심 수정: 이미지가 실제로 저장된 서버의 물리적 디렉토리 경로 정의
+        // 폴더 구조 이미지에 따라, 업로드 경로는 'pages/uploads' 입니다.
+        const UPLOADS_DIR = path.join(__dirname, "pages", "uploads"); 
 
-        const index = novels.findIndex((n) => n.novelId === novelId);
+        try {
+            const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
+            const index = novels.findIndex((n) => n.novelId === novelId);
 
-        if (index === -1) {
-            // 작품을 찾지 못했을 경우, 혹시 업로드된 파일이 있다면 삭제하는 로직을 추가하는 것이 좋습니다.
-            if (req.file) {
-                fs.unlinkSync(req.file.path);
-            }
-            return res.status(404).send("해당 작품을 찾을 수 없습니다.");
-        }
-        const currentNovel = novels[index]; // 🔥 로그인한 유저가 이 작품의 소유자인지 체크
-
-        if (currentNovel.userId !== req.session.user.id) {
-            return res.status(403).send("수정 권한이 없습니다.");
-        } // 1. 이미지 파일 처리 로직 (가장 중요)
-
-        if (req.file) {
-            // 🔥 [추가] 새 이미지가 업로드된 경우: 기존 이미지 파일 삭제
-            if (
-                currentNovel.coverImageUrl &&
-                !currentNovel.coverImageUrl.includes("placehold.co")
-            ) {
-                // 기존 파일 경로에서 파일 이름 추출 (예: /uploads/파일명 -> 파일명)
-                const oldFileName = path.basename(currentNovel.coverImageUrl);
-                const oldFilePath = path.join(
-                    __dirname,
-                    "pages",
-                    "uploads",
-                    oldFileName
-                );
-                if (fs.existsSync(oldFilePath)) {
-                    fs.unlink(oldFilePath, (err) => {
-                        if (err)
-                            console.error(
-                                "기존 이미지 삭제 실패:",
-                                oldFilePath,
-                                err
-                            );
-                    });
+            if (index === -1) {
+                // 작품을 찾지 못했을 경우, 업로드된 파일이 있다면 삭제 (Multer가 저장한 파일)
+                if (req.file) {
+                    fs.unlinkSync(req.file.path);
                 }
-            } // 새 파일 경로 업데이트
-            currentNovel.coverImageUrl = `/uploads/${req.file.filename}`;
-        } // 2. 데이터 수정
+                return res.status(404).send("해당 작품을 찾을 수 없습니다.");
+            }
 
-        currentNovel.title = title;
-        currentNovel.description = description;
-        currentNovel.status = status; // 상태값 업데이트
+            const currentNovel = novels[index];
 
-        fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
+            // 로그인한 유저가 이 작품의 소유자인지 체크
+            if (currentNovel.userId !== req.session.user.id) {
+                // 권한이 없으므로 새로 업로드된 파일도 삭제해야 함
+                if (req.file) {
+                    fs.unlinkSync(req.file.path);
+                }
+                return res.status(403).send("수정 권한이 없습니다.");
+            }
 
-        res.redirect("/mynovel");
+            // 1. 이미지 파일 처리 로직
+            if (req.file) {
+                // 새 이미지가 업로드된 경우: 기존 이미지 파일 삭제 시도
+                if (
+                    currentNovel.coverImageUrl &&
+                    !currentNovel.coverImageUrl.includes("placehold.co")
+                ) {
+                    // novels.json에 저장된 URL 경로에서 파일 이름만 추출
+                    // 예: "/uploads/image.jpg" -> "image.jpg"
+                    const oldFileName = path.basename(currentNovel.coverImageUrl);
+                    
+                    // ⭐ 수정된 경로: 실제 물리적 업로드 디렉토리(pages/uploads)를 기준으로 파일 경로 생성
+                    const oldFilePath = path.join(UPLOADS_DIR, oldFileName); 
+
+                    if (fs.existsSync(oldFilePath)) {
+                        // 기존 파일 삭제
+                        fs.unlink(oldFilePath, (err) => {
+                            if (err)
+                                console.error(
+                                    `기존 이미지 삭제 실패: ${oldFilePath}`,
+                                    err
+                                );
+                        });
+                    }
+                }
+                // 새 파일 경로를 novels.json에 저장할 URL 형식으로 업데이트
+                // req.file.filename은 Multer가 저장한 파일 이름입니다. (Multer 설정에 따라 이미 'pages/uploads'에 저장되었을 것입니다)
+                currentNovel.coverImageUrl = `/uploads/${req.file.filename}`;
+            }
+
+            // 2. 데이터 수정 (제목, 설명, 상태, 장르)
+            currentNovel.title = title;
+            currentNovel.description = description;
+            currentNovel.status = status;
+            currentNovel.genre = genre; // ⭐ 장르 업데이트
+
+            // 파일에 변경된 내용 저장
+            fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
+
+            res.redirect("/mynovel");
+
+        } catch (error) {
+            console.error("작품 수정 중 오류 발생:", error);
+            // 오류 발생 시, 새로 업로드된 파일이 있다면 삭제 처리
+            if (req.file) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (unlinkError) {
+                    console.error("오류 발생 후 파일 정리 실패:", unlinkError);
+                }
+            }
+            res.status(500).send("작품 수정 중 서버 오류가 발생했습니다.");
+        }
     }
 );
-
 // app.get("/addnovel", (req, res) => {
 //     res.render("addnovel", {});
 // });
