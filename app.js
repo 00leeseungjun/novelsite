@@ -1,5 +1,3 @@
-
-
 const path = require("path");
 const fs = require("fs");
 const express = require("express");
@@ -7,6 +5,22 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const uuid = require("uuid");
 const multer = require("multer"); // 1. Multer 추가////////////////////////////////////////////////////
+const mysql = require("mysql2/promise"); // 🔥 mysql2의 Promise API 로드
+
+// -------------------- 🔥 DB 연결 설정 (이 부분을 수정) --------------------
+const dbConfig = {
+    host: "localhost", // 보통 'localhost' 또는 DB 서버 주소
+    user: "root", // MySQL 설치 시 설정한 사용자 이름
+    password: "@Chaco4747", // 🔑 MySQL 설치 시 설정한 비밀번호
+    database: "novel_site", // 💡 'webnovel_app' -> 'novel_site'로 변경
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+};
+
+// Connection Pool 생성
+const db = mysql.createPool(dbConfig);
+// --------------------------------------------------------------------------
 
 const app = express();
 
@@ -45,28 +59,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-const novelPath = path.join(__dirname, "data", "novels.json");
-const episodePath = path.join(__dirname, "data", "episodes.json");
-
-const readData = (filePath) => {
-    try {
-        return JSON.parse(fs.readFileSync(filePath, "utf8"));
-    } catch (error) {
-        console.error(`Error reading ${filePath}:`, error);
-        return [];
-    }
-};
-
-// 데이터를 쓰는 함수
-const writeData = (filePath, data) => {
-    try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-    } catch (error) {
-        console.error("데이터 저장 실패:", error);
-        throw new Error("데이터 저장 중 오류가 발생했습니다.");
-    }
-};
-
 
 // 🔥 세션 미들웨어 (무조건 req.session 쓰는 것들보다 위에 있어야 함)
 app.use(
@@ -95,9 +87,7 @@ app.use(express.urlencoded({ extended: true }));
 // 정적 파일, POST body 파싱
 // app.use(express.static("pages"));
 app.use(express.static(path.join(__dirname, "pages")));
-app.use("/js", express.static(path.join(__dirname, "pagea", "js")));
-
-
+app.use("/js", express.static(path.join(__dirname, "pages", "js")));
 
 // 🔥 모든 ejs에서 user 쓸 수 있게 (세션 다음!)
 app.use((req, res, next) => {
@@ -124,26 +114,37 @@ app.get("/login", (req, res) => {
 app.post("/login", async (req, res) => {
     const { id, password } = req.body;
 
-    const userPath = path.join(__dirname, "data", "users.json");
-    const users = JSON.parse(fs.readFileSync(userPath, "utf8"));
+    // -------------------- 🔥 DB 쿼리 시작 --------------------
+    try {
+        // 1. ID로 사용자 찾기 (패스워드와 닉네임만 가져옵니다)
+        const [users] = await db.query(
+            "SELECT id, password, nickname FROM users WHERE id = ?",
+            [id]
+        );
 
-    const user = users.find((u) => u.id === id);
-    if (!user) {
-        return res.send("❌ 존재하지 않는 아이디입니다.");
+        const user = users[0];
+        if (!user) {
+            return res.send("❌ 존재하지 않는 아이디입니다.");
+        }
+
+        // 2. 비밀번호 비교
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return res.send("❌ 비밀번호가 틀렸습니다.");
+        }
+
+        // 3. 세션 저장
+        req.session.user = {
+            id: user.id,
+            nickname: user.nickname,
+        };
+
+        res.redirect("/main");
+    } catch (error) {
+        console.error("로그인 DB 오류:", error);
+        res.status(500).send("로그인 중 서버 오류가 발생했습니다.");
     }
-
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-        return res.send("❌ 비밀번호가 틀렸습니다.");
-    }
-
-    // 세션 저장
-    req.session.user = {
-        id: user.id,
-        nickname: user.nickname,
-    };
-
-    res.redirect("/main");
+    // -------------------- 🔥 DB 쿼리 끝 --------------------
 });
 
 // 회원가입 페이지
@@ -154,32 +155,36 @@ app.get("/signup", (req, res) => {
 // 회원가입 처리
 app.post("/signup", async (req, res) => {
     const { id, email, password, nickname } = req.body;
-
-    const userPath = path.join(__dirname, "data", "users.json");
-    const fileData = fs.readFileSync(userPath, "utf8");
-    const users = JSON.parse(fileData);
-
-    const exists = users.find((user) => user.id === id);
-    if (exists) {
-        return res.status(400).send("이미 사용중인 아이디입니다.");
+    // -------------------- 🔥 DB 쿼리 시작 --------------------
+    try {
+        // 1. ID 중복 확인
+        const [existingUsers] = await db.query(
+            "SELECT id FROM users WHERE id = ? OR email = ? OR nickname = ?",
+            [id, email, nickname]
+        );
+        if (existingUsers.length > 0) {
+            const exists = existingUsers[0];
+            if (exists.id === id) {
+                return res.status(400).send("이미 사용중인 아이디입니다.");
+            } else if (exists.email === email) {
+                return res.status(400).send("이미 사용중인 이메일입니다.");
+            } else if (exists.nickname === nickname) {
+                return res.status(400).send("이미 사용중인 닉네임입니다.");
+            }
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        // 2. 새 사용자 DB에 삽입
+        await db.query(
+            "INSERT INTO users (id, email, password, nickname) VALUES (?, ?, ?, ?)",
+            [id, email, hashedPassword, nickname]
+        );
+        res.send("회원가입 성공!");
+    } catch (error) {
+        console.error("회원가입 DB 오류:", error);
+        res.status(500).send("회원가입 중 서버 오류가 발생했습니다.");
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = {
-        id,
-        email,
-        password: hashedPassword,
-        nickname,
-    };
-
-    users.push(newUser);
-    fs.writeFileSync(userPath, JSON.stringify(users, null, 2));
-
-    res.send("회원가입 성공!");
+    // -------------------- 🔥 DB 쿼리 끝 --------------------
 });
-
-
 
 // 로그아웃
 app.get("/logout", (req, res) => {
@@ -191,113 +196,161 @@ app.get("/logout", (req, res) => {
 /* -------------------- 3. 메인 / 리스트 페이지 -------------------- */
 
 // 메인 페이지
-app.get("/main", (req, res) => {
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
+// 메인 페이지
+app.get("/main", async (req, res) => {
+    // -------------------- 🔥 DB 쿼리 시작 --------------------
+    try {
+        // 1. 좋아요 수(likes)를 기준으로 내림차순 정렬하여 모든 소설을 가져옵니다.
+        const [novels] = await db.query(
+            "SELECT * FROM novels ORDER BY likes DESC"
+        );
 
-    const sortedNovels = [...novels].sort((a, b) => {
-        const likesA = typeof a.likes === "number" ? a.likes : 0;
-        const likesB = typeof b.likes === "number" ? b.likes : 0;
-        return likesB - likesA;
-    });
+        // 2. 소설들을 연재 상태별로 필터링합니다. (DB에서 직접 WHERE 절로 가져오는 것도 가능)
+        const ongoingNovels = novels.filter(
+            (n) => n.status === "연재중" || n.status === "연재 중"
+        );
+        const completedNovels = novels.filter((n) => n.status === "완결");
 
-    const ongoingNovels = sortedNovels.filter((n) => n.status === "연재중");
-    const completedNovels = sortedNovels.filter((n) => n.status === "완결");
-
-    res.render("index", {
-        novels: sortedNovels,
-        ongoingNovels,
-        completedNovels,
-    });
+        res.render("index", {
+            novels, // 정렬된 전체 소설
+            ongoingNovels,
+            completedNovels,
+        });
+    } catch (error) {
+        console.error("메인 페이지 DB 오류:", error);
+        res.status(500).send("메인 페이지 로딩 중 서버 오류가 발생했습니다.");
+    }
+    // -------------------- 🔥 DB 쿼리 끝 --------------------
 });
 
 // 전체 소설 리스트
-app.get("/allnovel", (req, res) => {
-    const filePath = path.join(__dirname, "data", "novels.json");
-    const fileData = fs.readFileSync(filePath, "utf8");
-    const storednovels = JSON.parse(fileData);
+app.get("/allnovel", async (req, res) => {
+    try {
+        const [storednovels] = await db.query("SELECT * FROM novels");
 
-    res.render("allnovel", { novels: storednovels });
+        res.render("allnovel", { novels: storednovels });
+    } catch (error) {
+        console.error("전체 소설 리스트 DB 오류:", error);
+        res.status(500).send("소설 리스트 로딩 중 서버 오류가 발생했습니다.");
+    }
 });
 
 // 완결작 리스트
-app.get("/complete", (req, res) => {
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
+app.get("/complete", async (req, res) => {
+    try {
+        const [completedNovels] = await db.query(
+            "SELECT * FROM novels WHERE status = '완결'"
+        );
 
-    const completedNovels = novels.filter((n) => n.status === "완결");
-
-    res.render("complete", { completedNovels });
+        res.render("complete", { completedNovels });
+    } catch (error) {
+        console.error("완결작 리스트 DB 오류:", error);
+        res.status(500).send("완결작 리스트 로딩 중 서버 오류가 발생했습니다.");
+    }
 });
 
 // 연재중 리스트
-app.get("/live", (req, res) => {
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
+app.get("/live", async (req, res) => {
+    try {
+        const [ongoingNovels] = await db.query(
+            "SELECT * FROM novels WHERE status = '연재중' OR status = '연재 중'"
+        );
 
-    const ongoingNovels = novels.filter((n) => n.status === "연재중");
-
-    res.render("live", { novels: ongoingNovels });
+        res.render("live", { novels: ongoingNovels });
+    } catch (error) {
+        console.error("연재중 리스트 DB 오류:", error);
+        res.status(500).send("연재중 리스트 로딩 중 서버 오류가 발생했습니다.");
+    }
 });
 
 // 내 작품 페이지 (로그인 필요)
-app.get("/mynovel", requireLogin, (req, res) => {
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
+app.get("/mynovel", requireLogin, async (req, res) => {
     const loginUserId = req.session.user.id;
-    const myNovels = novels.filter((novel) => novel.userId === loginUserId);
 
-    res.render("mynovel", { user: req.session.user, novels: myNovels });
+    try {
+        // 로그인한 사용자의 ID로 소설들을 필터링합니다.
+        const [myNovels] = await db.query(
+            "SELECT * FROM novels WHERE userId = ?",
+            [loginUserId]
+        );
+
+        res.render("mynovel", { user: req.session.user, novels: myNovels });
+    } catch (error) {
+        console.error("내 작품 페이지 DB 오류:", error);
+        res.status(500).send("내 작품 로딩 중 서버 오류가 발생했습니다.");
+    }
 });
 
-
-
-app.get("/writer/:userId", (req, res) => {
+app.get("/writer/:userId", async (req, res) => { // ⭐ async 추가
     const userId = req.params.userId;
 
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
+    try {
+        // 1. 해당 작가의 모든 작품 조회 (닉네임도 같이 가져와서 작가 정보로 사용)
+        const [writerNovels] = await db.query(
+            "SELECT novels.*, users.nickname FROM novels JOIN users ON novels.userId = users.id WHERE novels.userId = ?",
+            [userId]
+        );
 
-    // writerId에 해당하는 모든 작품 가져오기
-    const writerNovels = novels.filter((n) => n.userId === userId);
+        if (writerNovels.length === 0) {
+            // 작가 닉네임을 찾기 위해 users 테이블에서 한 번 더 조회
+            const [userRow] = await db.query("SELECT nickname FROM users WHERE id = ?", [userId]);
+            if (userRow.length === 0) {
+                return res.status(404).send("해당 작가를 찾을 수 없습니다.");
+            }
+            // 작가는 존재하지만 작품이 없는 경우
+            const writer = { nickname: userRow[0].nickname, bio: null };
+            return res.render("writer", { writer, writerNovels: [] });
+        }
 
-    if (writerNovels.length === 0) {
-        return res.status(404).send("해당 작가의 작품이 없습니다.");
+        // 2. 작가 정보 (첫 번째 작품 또는 users 테이블에서 가져옴)
+        const writer = {
+            nickname: writerNovels[0].nickname,
+            bio: null, // DB에 bio 컬럼이 없으므로 null 처리
+        };
+
+        res.render("writer", {
+            writer,
+            writerNovels,
+        });
+
+    } catch (error) {
+        console.error("작가 페이지 DB 오류:", error);
+        res.status(500).send("작가 페이지 로딩 중 서버 오류가 발생했습니다.");
     }
-
-    // 작가 정보
-    const writer = {
-        nickname: writerNovels[0].nickname,
-        bio: writerNovels[0].bio || null,
-    };
-
-    res.render("writer", {
-        writer,
-        writerNovels,
-    });
 });
 
 // app.get("/editnovel", (req, res) => {
 //     res.render("editnovel", {});
 // });
 
-app.get("/editnovel", requireLogin, (req, res) => {
+app.get("/editnovel", requireLogin, async (req, res) => {
     const novelId = req.query.novel;
+    const currentUserId = req.session.user.id;
 
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
+    try {
+        // 1. novelId로 소설 조회
+        const [novels] = await db.query(
+            "SELECT * FROM novels WHERE novelId = ?",
+            [novelId]
+        );
 
-    const novel = novels.find((n) => n.novelId === novelId);
+        const novel = novels[0];
 
-    if (!novel) {
-        return res.status(404).send("해당 작품을 찾을 수 없습니다.");
+        if (!novel) {
+            return res.status(404).send("해당 작품을 찾을 수 없습니다.");
+        }
+
+        // 2. 작품 소유자 확인
+        if (novel.userId !== currentUserId) {
+            return res.status(403).send("수정 권한이 없습니다.");
+        }
+
+        res.render("editnovel", { novel });
+    } catch (error) {
+        console.error("작품 수정 페이지 로드 DB 오류:", error);
+        res.status(500).send("작품 정보 로딩 중 서버 오류가 발생했습니다.");
     }
-
-    res.render("editnovel", { novel });
 });
-
-
 
 // ... (multer, requireLogin 등 다른 미들웨어는 여기에 있다고 가정)
 
@@ -305,58 +358,54 @@ app.post(
     "/editnovel/:novelId",
     requireLogin,
     upload.single("coverImage"),
-    (req, res) => {
-        // novelId를 URL 파라미터에서 가져옵니다.
+    async (req, res) => {
+        // ⭐ async 추가
         const novelId = req.params.novelId;
-        // ⭐ 장르(genre) 필드를 추가로 가져옵니다.
-        const { title, description, status, genre } = req.body; 
+        const { title, description, status, genre } = req.body;
+        const currentUserId = req.session.user.id;
 
-        // 작품 데이터 파일 경로
-        const novelPath = path.join(__dirname, "data", "novels.json");
-        
-        // ⭐ 핵심 수정: 이미지가 실제로 저장된 서버의 물리적 디렉토리 경로 정의
-        // 폴더 구조 이미지에 따라, 업로드 경로는 'pages/uploads' 입니다.
-        const UPLOADS_DIR = path.join(__dirname, "pages", "uploads"); 
+        const UPLOADS_DIR = path.join(__dirname, "pages", "uploads");
 
         try {
-            const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-            const index = novels.findIndex((n) => n.novelId === novelId);
+            // 1. 현재 소설 정보 조회
+            const [existingNovels] = await db.query(
+                "SELECT userId, coverImageUrl FROM novels WHERE novelId = ?",
+                [novelId]
+            );
 
-            if (index === -1) {
-                // 작품을 찾지 못했을 경우, 업로드된 파일이 있다면 삭제 (Multer가 저장한 파일)
+            const currentNovel = existingNovels[0];
+
+            if (!currentNovel) {
+                // 작품을 찾지 못했을 경우, 업로드된 파일이 있다면 삭제
                 if (req.file) {
                     fs.unlinkSync(req.file.path);
                 }
                 return res.status(404).send("해당 작품을 찾을 수 없습니다.");
             }
 
-            const currentNovel = novels[index];
-
-            // 로그인한 유저가 이 작품의 소유자인지 체크
-            if (currentNovel.userId !== req.session.user.id) {
-                // 권한이 없으므로 새로 업로드된 파일도 삭제해야 함
+            // 2. 로그인한 유저가 이 작품의 소유자인지 체크
+            if (currentNovel.userId !== currentUserId) {
+                // 권한이 없으므로 새로 업로드된 파일도 삭제
                 if (req.file) {
                     fs.unlinkSync(req.file.path);
                 }
                 return res.status(403).send("수정 권한이 없습니다.");
             }
 
-            // 1. 이미지 파일 처리 로직
+            // 3. 이미지 파일 처리 로직 (파일 시스템 로직 유지)
+            let newCoverImageUrl = currentNovel.coverImageUrl;
+
             if (req.file) {
-                // 새 이미지가 업로드된 경우: 기존 이미지 파일 삭제 시도
+                // 기존 이미지 삭제 시도
                 if (
                     currentNovel.coverImageUrl &&
                     !currentNovel.coverImageUrl.includes("placehold.co")
                 ) {
-                    // novels.json에 저장된 URL 경로에서 파일 이름만 추출
-                    // 예: "/uploads/image.jpg" -> "image.jpg"
-                    const oldFileName = path.basename(currentNovel.coverImageUrl);
-                    
-                    // ⭐ 수정된 경로: 실제 물리적 업로드 디렉토리(pages/uploads)를 기준으로 파일 경로 생성
-                    const oldFilePath = path.join(UPLOADS_DIR, oldFileName); 
-
+                    const oldFileName = path.basename(
+                        currentNovel.coverImageUrl
+                    );
+                    const oldFilePath = path.join(UPLOADS_DIR, oldFileName);
                     if (fs.existsSync(oldFilePath)) {
-                        // 기존 파일 삭제
                         fs.unlink(oldFilePath, (err) => {
                             if (err)
                                 console.error(
@@ -366,22 +415,19 @@ app.post(
                         });
                     }
                 }
-                // 새 파일 경로를 novels.json에 저장할 URL 형식으로 업데이트
-                // req.file.filename은 Multer가 저장한 파일 이름입니다. (Multer 설정에 따라 이미 'pages/uploads'에 저장되었을 것입니다)
-                currentNovel.coverImageUrl = `/uploads/${req.file.filename}`;
+                // 새 파일 경로 설정
+                newCoverImageUrl = `/uploads/${req.file.filename}`;
             }
 
-            // 2. 데이터 수정 (제목, 설명, 상태, 장르)
-            currentNovel.title = title;
-            currentNovel.description = description;
-            currentNovel.status = status;
-            currentNovel.genre = genre; // ⭐ 장르 업데이트
-
-            // 파일에 변경된 내용 저장
-            fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
+            // 4. DB 데이터 수정 (UPDATE 쿼리 실행)
+            await db.query(
+                `UPDATE novels 
+                SET title = ?, description = ?, status = ?, genre = ?, coverImageUrl = ? 
+                WHERE novelId = ?`,
+                [title, description, status, genre, newCoverImageUrl, novelId]
+            );
 
             res.redirect("/mynovel");
-
         } catch (error) {
             console.error("작품 수정 중 오류 발생:", error);
             // 오류 발생 시, 새로 업로드된 파일이 있다면 삭제 처리
@@ -397,168 +443,229 @@ app.post(
     }
 );
 
-
 app.get("/addnovel", requireLogin, (req, res) => {
     res.render("addnovel");
 });
 
+app.post(
+    "/addnovel",
+    requireLogin,
+    upload.single("novelCover"),
+    async (req, res) => {
+        // req.file 객체와 req.session.user는 Multer와 requireLogin 미들웨어를 통해 접근 가능합니다.
+        const { title, description, genre } = req.body;
 
+        // 커버 이미지 경로 설정 (DB에 저장할 URL 형식)
+        const coverImageUrl = req.file
+            ? `/uploads/${req.file.filename}`
+            : "https://placehold.co/160x220/e5e5e5/777?text=NO+IMAGE";
 
-app.post("/addnovel", requireLogin, upload.single("novelCover"), (req, res) => {
-    // 1. req.body에서 title, description, 그리고 새로 추가할 genre를 가져옵니다.
-    const { title, description, genre } = req.body; 
+        const newNovelId = uuid.v4(); // 새 소설의 고유 ID 생성
+        const currentUserId = req.session.user.id;
+        const currentUserNickname = req.session.user.nickname;
 
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8")); 
+        try {
+            // 1. 소설 정보를 novels 테이블에 삽입
+            await db.query(
+                `INSERT INTO novels 
+            (novelId, title, description, genre, userId, nickname, status, likes, coverImageUrl) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)`,
+                [
+                    newNovelId,
+                    title,
+                    description,
+                    genre,
+                    currentUserId,
+                    currentUserNickname,
+                    "연재중", // 기본 상태
+                    coverImageUrl,
+                ]
+            );
 
-    // 커버 이미지 경로 설정
-    const coverImageUrl = req.file
-        ? `/uploads/${req.file.filename}`
-        : "https://placehold.co/160x220/e5e5e5/777?text=NO+IMAGE"; 
-
-    const newNovel = {
-        id: uuid.v4(),
-        novelId: uuid.v4(),
-        title,
-        description,
-        // 2. 장르(genre) 필드를 새 소설 객체에 추가합니다.
-        genre, 
-        nickname: req.session.user.nickname,
-        userId: req.session.user.id,
-        status: "연재중",
-        likes: 0,
-        coverImageUrl, 
-    };
-
-    novels.push(newNovel);
-
-    fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
-
-    res.redirect("/mynovel");
-});
-
-
-
-app.post("/deletenovel", requireLogin, (req, res) => {
-    const { novelId } = req.body;
-
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    let novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-    const index = novels.findIndex((n) => n.novelId === novelId);
-    if (index === -1) {
-        return res.status(404).send("삭제할 작품을 찾을 수 없습니다.");
-    } // 🔥 소유권 확인
-
-    if (novels[index].userId !== req.session.user.id) {
-        return res.status(403).send("❌ 삭제 권한이 없습니다.");
-    } // 🔥 [추가] 작품 삭제 전에 연결된 이미지 파일 삭제
-    if (
-        novels[index].coverImageUrl &&
-        !novels[index].coverImageUrl.includes("placehold.co")
-    ) {
-        const oldFileName = path.basename(novels[index].coverImageUrl);
-        const oldFilePath = path.join(
-            __dirname,
-            "pages",
-            "uploads",
-            oldFileName
-        );
-        if (fs.existsSync(oldFilePath)) {
-            fs.unlink(oldFilePath, (err) => {
-                if (err)
-                    console.error(
-                        "삭제할 이미지 파일 삭제 실패:",
-                        oldFilePath,
-                        err
-                    );
-            });
+            // 2. 작성 후 내 작품 페이지로 이동
+            res.redirect("/mynovel");
+        } catch (error) {
+            console.error("작품 등록 DB 오류:", error);
+            // 오류 발생 시, 새로 업로드된 파일이 있다면 삭제 처리
+            if (req.file) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (unlinkError) {
+                    console.error("오류 발생 후 파일 정리 실패:", unlinkError);
+                }
+            }
+            res.status(500).send("작품 등록 중 서버 오류가 발생했습니다.");
         }
-    } // 작품 삭제 (해당 인덱스 제거)
+    }
+);
 
-    novels.splice(index, 1); // 💡 참고: 실제 운영 환경에서는 이 작품에 속한 에피소드, 댓글, 좋아요 데이터도 모두 삭제해야 합니다.
-    fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
+app.post("/deletenovel", requireLogin, async (req, res) => {
+    // ⭐ async 추가
+    const { novelId } = req.body;
+    const currentUserId = req.session.user.id;
 
-    res.redirect("/mynovel");
+    // 작품 삭제 전, 연결된 파일 삭제를 위한 정보 조회
+    const [novelRows] = await db.query(
+        "SELECT userId, coverImageUrl FROM novels WHERE novelId = ?",
+        [novelId]
+    );
+
+    const novelToDelete = novelRows[0];
+
+    if (!novelToDelete) {
+        return res.status(404).send("삭제할 작품을 찾을 수 없습니다.");
+    }
+
+    // 소유권 확인
+    if (novelToDelete.userId !== currentUserId) {
+        return res.status(403).send("❌ 삭제 권한이 없습니다.");
+    }
+
+    try {
+        // 1. 파일 시스템에서 이미지 삭제 (기존 로직 유지)
+        if (
+            novelToDelete.coverImageUrl &&
+            !novelToDelete.coverImageUrl.includes("placehold.co")
+        ) {
+            const oldFileName = path.basename(novelToDelete.coverImageUrl);
+            const oldFilePath = path.join(
+                __dirname,
+                "pages",
+                "uploads",
+                oldFileName
+            );
+            if (fs.existsSync(oldFilePath)) {
+                fs.unlink(oldFilePath, (err) => {
+                    if (err)
+                        console.error(
+                            "삭제할 이미지 파일 삭제 실패:",
+                            oldFilePath,
+                            err
+                        );
+                });
+            }
+        }
+
+        // 2. DB에서 연결된 데이터 삭제 (외래키 제약 조건을 고려하여 순서대로)
+        // A. 좋아요 삭제 (likes 테이블)
+        await db.query("DELETE FROM likes WHERE novelId = ?", [novelId]);
+        // B. 댓글 삭제 (comments 테이블)
+        await db.query("DELETE FROM comments WHERE novelId = ?", [novelId]);
+        // C. 회차 삭제 (episodes 테이블)
+        await db.query("DELETE FROM episodes WHERE novelId = ?", [novelId]);
+        // D. 소설 삭제 (novels 테이블)
+        await db.query("DELETE FROM novels WHERE novelId = ?", [novelId]);
+
+        res.redirect("/mynovel");
+    } catch (error) {
+        console.error("작품 삭제 DB 오류:", error);
+        res.status(500).send("작품 삭제 중 서버 오류가 발생했습니다.");
+    }
 });
 
 app.get(
-    "/editepisode/:novelId/episode/:episodeNumber", // episodeNumber 기반으로 라우트 설정
+    "/editepisode/:novelId/episode/:episodeNumber",
     requireLogin,
-    (req, res) => {
-        // URL에서 novelId와 episodeNumber를 추출합니다.
+    async (req, res) => {
+        // ⭐ async 추가
         const { novelId, episodeNumber } = req.params;
-        const novels = readData(novelPath);
-        const episodes = readData(episodePath);
+        const currentUserId = req.session.user.id;
 
-        const novel = novels.find((n) => n.novelId === novelId);
-        
-        // episodeNumber와 novelId가 모두 일치하는 에피소드를 찾습니다.
-        // 참고: episodeNumber가 문자열 형태라고 가정하고 비교합니다.
-        const episode = episodes.find((e) => e.episodeNumber == episodeNumber && e.novelId === novelId);
+        try {
+            // 1. 소설 정보 및 소유자 조회
+            const [novelRows] = await db.query(
+                "SELECT userId, title FROM novels WHERE novelId = ?",
+                [novelId]
+            );
+            const novel = novelRows[0];
 
-        if (!novel || !episode) {
-            return res.status(404).send("소설 또는 에피소드를 찾을 수 없습니다.");
+            if (!novel) {
+                return res.status(404).send("소설을 찾을 수 없습니다.");
+            }
+
+            // 2. 작품 소유자 확인 (권한 체크)
+            if (novel.userId !== currentUserId) {
+                return res.status(403).send("수정 권한이 없습니다.");
+            }
+
+            // 3. 에피소드 정보 조회
+            // episodeNumber는 INT 타입이므로, 파라미터로 받은 문자열을 숫자로 변환할 필요 없이 DB에서 조회 가능
+            const [episodeRows] = await db.query(
+                "SELECT * FROM episodes WHERE novelId = ? AND episodeNumber = ?",
+                [novelId, episodeNumber]
+            );
+
+            const episode = episodeRows[0];
+
+            if (!episode) {
+                return res.status(404).send("에피소드를 찾을 수 없습니다.");
+            }
+
+            // editepisode.ejs 렌더링
+            res.render("editepisode", {
+                novelId: novelId,
+                novelTitle: novel.title,
+                episode: episode,
+                session: req.session,
+            });
+        } catch (error) {
+            console.error("회차 수정 페이지 로드 DB 오류:", error);
+            res.status(500).send("에피소드 정보 로딩 중 오류가 발생했습니다.");
         }
-
-        // 🔥 작품 소유자 확인 (권한 체크)
-        if (novel.userId !== req.session.user.id) {
-            return res.status(403).send("수정 권한이 없습니다.");
-        }
-
-        // editepisode.ejs 렌더링
-        res.render("editepisode", { 
-            novelId: novelId,
-            novelTitle: novel.title, // EJS 페이지 제목에 사용
-            episode: episode, // 찾은 에피소드 데이터 전체 전달
-            session: req.session 
-        });
     }
 );
 
 app.post(
-    "/editepisode/:novelId/episode/:episodeNumber", 
+    "/editepisode/:novelId/episode/:episodeNumber",
     requireLogin,
-    (req, res) => {
+    async (req, res) => {
+        // ⭐ async 추가
         const { novelId, episodeNumber } = req.params;
-        
-        // 폼에서 전송된 새로운 제목과 내용
-        const { title, content } = req.body; 
-        
-        const novels = readData(novelPath);
-        const episodes = readData(episodePath);
+        const { title, content } = req.body;
+        const currentUserId = req.session.user.id;
 
-        const novel = novels.find((n) => n.novelId === novelId);
-        // episodeNumber와 novelId가 모두 일치하는 에피소드를 찾아 인덱스를 확인합니다.
-        const index = episodes.findIndex((e) => e.episodeNumber == episodeNumber && e.novelId === novelId);
-
-        if (!novel || index === -1) {
-            return res.status(404).send("소설 또는 에피소드를 찾을 수 없습니다.");
-        }
-
-        const currentEpisode = episodes[index];
-
-        // 작품 소유자 확인
-        if (novel.userId !== req.session.user.id) {
-            return res.status(403).send("수정 권한이 없습니다.");
-        }
-
-        // 3. 에피소드 데이터 수정
-        currentEpisode.episodeTitle = title; 
-        currentEpisode.content = content;
-        // ✅ 수정됨: 에피소드가 실제로 수정되었으므로, updatedAt을 최신 시간으로 업데이트합니다.
-        currentEpisode.updatedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        
-        // 4. 파일에 저장
         try {
-            fs.writeFileSync(episodePath, JSON.stringify(episodes, null, 2));
-        } catch (error) {
-            console.error("에피소드 데이터 저장 실패:", error);
-            return res.status(500).send("에피소드 수정 중 오류가 발생했습니다.");
-        }
+            // 1. 소설 정보 및 소유자 조회 (권한 체크를 위해)
+            const [novelRows] = await db.query(
+                "SELECT userId FROM novels WHERE novelId = ?",
+                [novelId]
+            );
+            const novel = novelRows[0];
 
-        // 5. 성공 시 해당 작품 페이지로 리다이렉트
-        res.redirect(`/novel/${novelId}`);
+            if (!novel) {
+                return res.status(404).send("소설을 찾을 수 없습니다.");
+            }
+
+            // 2. 작품 소유자 확인
+            if (novel.userId !== currentUserId) {
+                return res.status(403).send("수정 권한이 없습니다.");
+            }
+
+            // 3. 에피소드 데이터 수정 (UPDATE 쿼리 실행)
+            const timestamp = new Date()
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ");
+
+            const [result] = await db.query(
+                `UPDATE episodes 
+                SET episodeTitle = ?, content = ?, updatedAt = ? 
+                WHERE novelId = ? AND episodeNumber = ?`,
+                [title, content, timestamp, novelId, episodeNumber]
+            );
+
+            if (result.affectedRows === 0) {
+                return res
+                    .status(404)
+                    .send("수정할 에피소드를 찾을 수 없습니다.");
+            }
+
+            // 4. 성공 시 해당 작품 페이지로 리다이렉트
+            res.redirect(`/novel/${novelId}`);
+        } catch (error) {
+            console.error("회차 수정 DB 오류:", error);
+            res.status(500).send("에피소드 수정 중 서버 오류가 발생했습니다.");
+        }
     }
 );
 
@@ -574,7 +681,6 @@ app.get("/comment2", (req, res) => {
     res.render("comment copy2", {});
 });
 
-
 app.get("/addepisode", requireLogin, (req, res) => {
     const novelId = req.query.novel;
 
@@ -585,7 +691,8 @@ app.get("/addepisode", requireLogin, (req, res) => {
     res.render("addepisode", { novelId });
 });
 
-app.post("/addepisode", requireLogin, (req, res) => {
+app.post("/addepisode", requireLogin, async (req, res) => {
+    // ⭐ async 추가
     const { episodeTitle, content } = req.body;
     const novelId = req.query.novel; // URL에서 novelId 받음
 
@@ -593,241 +700,324 @@ app.post("/addepisode", requireLogin, (req, res) => {
         return res.status(400).send("novelId가 전달되지 않았습니다.");
     }
 
-    const episodePath = path.join(__dirname, "data", "episodes.json");
-    const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
+    try {
+        // 1. 해당 소설의 최대 회차 번호를 조회하여 다음 회차 번호를 계산
+        const [maxEpisodeRows] = await db.query(
+            "SELECT MAX(episodeNumber) AS maxNumber FROM episodes WHERE novelId = ?",
+            [novelId]
+        );
 
-    // 해당 소설의 기존 회차 숫자 계산 → 다음 회차 번호 자동 생성
-    const novelEpisodes = episodes.filter((ep) => ep.novelId === novelId);
-    const nextEpisodeNumber = novelEpisodes.length + 1;
+        // 최대 회차 번호가 NULL (즉, 첫 회차)이면 1, 아니면 기존 최대값 + 1
+        const maxNumber = maxEpisodeRows[0].maxNumber;
+        const nextEpisodeNumber = maxNumber === null ? 1 : maxNumber + 1;
 
-    // 타임스탬프를 한 번만 생성하여 createdAt과 updatedAt에 사용
-    const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        // 2. 작품 소유자 확인 (추가적인 안정성 확보)
+        const [novelRows] = await db.query(
+            "SELECT userId FROM novels WHERE novelId = ?",
+            [novelId]
+        );
+        const novel = novelRows[0];
 
-    const newEpisode = {
-        id: uuid.v4(),
-        novelId,
-        episodeNumber: nextEpisodeNumber,
-        episodeTitle: episodeTitle.trim(),
-        content: content.trim(),
-        createdAt: timestamp, // 생성 시간 기록
-        updatedAt: timestamp, // ✅ 추가: 수정 시간 초기화 (생성 시간과 동일)
-    };
+        if (!novel || novel.userId !== req.session.user.id) {
+            return res.status(403).send("회차 등록 권한이 없습니다.");
+        }
 
-    episodes.push(newEpisode);
+        // 3. 타임스탬프 생성
+        const timestamp = new Date()
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
 
-    fs.writeFileSync(episodePath, JSON.stringify(episodes, null, 2));
+        const newEpisodeId = uuid.v4();
 
-    // 작성 후 해당 소설의 작품 홈으로 이동
-    res.redirect(`/novel/${novelId}`);
+        // 4. 새 회차를 episodes 테이블에 삽입
+        await db.query(
+            `INSERT INTO episodes 
+            (id, novelId, episodeNumber, episodeTitle, content, createdAt, updatedAt) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [
+                newEpisodeId,
+                novelId,
+                nextEpisodeNumber,
+                episodeTitle.trim(),
+                content.trim(),
+                timestamp,
+                null, // 새 회차는 updatedAt에 NULL을 저장합니다. (테이블 정의에 따름)
+            ]
+        );
+
+        // 작성 후 해당 소설의 작품 홈으로 이동
+        res.redirect(`/novel/${novelId}`);
+    } catch (error) {
+        console.error("회차 등록 DB 오류:", error);
+        res.status(500).send("회차 등록 중 서버 오류가 발생했습니다.");
+    }
 });
 
 /* -------------------- 4. 소설 / 회차 / 댓글 관련 라우트 -------------------- */
 
-
-
-app.get("/novel/:novelId", (req, res) => {
+app.get("/novel/:novelId", async (req, res) => {
+    // ⭐ async 추가
     const novelId = req.params.novelId;
 
-    // JSON 파일을 DB처럼 관리
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const episodePath = path.join(__dirname, "data", "episodes.json");
+    try {
+        // 1. 소설 정보 조회
+        const [novelRows] = await db.query(
+            "SELECT * FROM novels WHERE novelId = ?",
+            [novelId]
+        );
+        const novel = novelRows[0];
 
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-    const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
+        if (!novel) {
+            return res.status(404).send("해당 소설을 찾을 수 없습니다.");
+        }
 
-    const novel = novels.find((n) => n.novelId === novelId);
-    if (!novel) {
-        return res.status(404).send("해당 소설을 찾을 수 없습니다.");
+        // 2. 해당 소설의 회차 목록 조회 (episodeNumber 오름차순 정렬)
+        const [novelEpisodes] = await db.query(
+            "SELECT * FROM episodes WHERE novelId = ? ORDER BY episodeNumber ASC",
+            [novelId]
+        );
+
+        // 3. 작성자 권한 확인
+        let isAuthor = false;
+        if (req.session.user && novel.userId === req.session.user.id) {
+            isAuthor = true;
+        }
+
+        // 4. EJS 렌더링
+        res.render("novel", {
+            novel,
+            episodes: novelEpisodes,
+            isAuthor: isAuthor,
+            user: req.session.user || null,
+        });
+    } catch (error) {
+        console.error("소설 상세 페이지 DB 오류:", error);
+        res.status(500).send("소설 정보 로딩 중 서버 오류가 발생했습니다.");
     }
-
-    // 🔑 작성자 권한 확인 로직 추가
-    let isAuthor = false;
-    // req.session.user가 존재하고, 작품의 userId와 세션의 ID가 일치하는지 확인
-    if (req.session.user && novel.userId === req.session.user.id) {
-        isAuthor = true;
-    }
-
-    // 회차 필터링 및 정렬
-    const novelEpisodes = episodes
-        .filter((ep) => ep.novelId === novelId)
-        .sort((a, b) => a.episodeNumber - b.episodeNumber);
-
-    // EJS 렌더링 시 권한 플래그와 사용자 정보 전달
-    res.render("novel", {
-        novel,
-        episodes: novelEpisodes,
-        isAuthor: isAuthor, // <-- 이 플래그로 EJS에서 수정 버튼을 보이게 합니다.
-        user: req.session.user || null,
-    });
 });
 
-
-
-app.get("/novel/:novelId/:episodeNumber", (req, res) => {
+app.get("/novel/:novelId/:episodeNumber", async (req, res) => {
+    // ⭐ async 추가
     const { novelId } = req.params;
     const episodeNumber = Number(req.params.episodeNumber);
 
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const episodePath = path.join(__dirname, "data", "episodes.json");
+    try {
+        // 1. 작품 정보 조회
+        const [novelRows] = await db.query(
+            "SELECT * FROM novels WHERE novelId = ?",
+            [novelId]
+        );
+        const novel = novelRows[0];
+        if (!novel) {
+            return res.status(404).send("해당 소설을 찾을 수 없습니다.");
+        }
 
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-    const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
+        // 2. 현재 회차 정보 조회
+        const [episodeRows] = await db.query(
+            "SELECT * FROM episodes WHERE novelId = ? AND episodeNumber = ?",
+            [novelId, episodeNumber]
+        );
+        const episode = episodeRows[0];
+        if (!episode) {
+            return res.status(404).send("해당 회차를 찾을 수 없습니다.");
+        }
 
-    // 현재 회차 찾기
-    const episode = episodes.find(
-        (ep) =>
-            ep.novelId === novelId && Number(ep.episodeNumber) === episodeNumber
-    );
-    if (!episode) {
-        return res.status(404).send("해당 회차를 찾을 수 없습니다.");
+        // 3. 총 회차 개수 계산
+        const [countRows] = await db.query(
+            "SELECT COUNT(*) AS totalEpisodes FROM episodes WHERE novelId = ?",
+            [novelId]
+        );
+        const totalEpisodes = countRows[0].totalEpisodes;
+
+        // 4. 이전화 / 다음화 계산
+        const prev = episodeNumber > 1 ? episodeNumber - 1 : null;
+        const next = episodeNumber < totalEpisodes ? episodeNumber + 1 : null;
+
+        // EJS 렌더링
+        res.render("episodes", {
+            episode,
+            novel,
+            user: req.session.user,
+            prev,
+            next,
+            total: totalEpisodes,
+        });
+    } catch (error) {
+        console.error("회차 읽기 DB 오류:", error);
+        res.status(500).send("회차 로딩 중 서버 오류가 발생했습니다.");
     }
-
-    // 작품 정보 찾기
-    const novel = novels.find((n) => n.novelId === novelId);
-    if (!novel) {
-        return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-    }
-
-    // 🔥 총 회차 개수 계산
-    const totalEpisodes = episodes.filter(
-        (ep) => ep.novelId === novelId
-    ).length;
-
-    // 🔥 이전화 / 다음화 계산 (실무 스타일)
-    const prev = episodeNumber > 1 ? episodeNumber - 1 : null;
-    const next = episodeNumber < totalEpisodes ? episodeNumber + 1 : null;
-
-    // EJS 렌더링
-    res.render("episodes", {
-        episode,
-        novel,
-        user: req.session.user,
-        prev,
-        next,
-        total: totalEpisodes,
-    });
 });
 
-app.get("/search", (req, res) => {
+app.get("/search", async (req, res) => {
+    // ⭐ async 추가
     const q = req.query.q?.trim();
     if (!q) return res.redirect("/main");
 
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
+    // DB에서 검색 문자열을 포함하는 소설을 찾기 위해 %q% 패턴 사용
+    const searchTerm = `%${q}%`;
 
-    // 🔍 검색 로직 (제목 + 필자닉네임 + 소개에서 포함 검색)
-    const result = novels.filter(
-        (n) =>
-            n.title.includes(q) ||
-            n.nickname.includes(q) ||
-            (n.description && n.description.includes(q))
-    );
+    try {
+        // 🔍 제목, 닉네임, 설명(description) 중 하나라도 검색어를 포함하는 소설 조회
+        const [result] = await db.query(
+            `SELECT * FROM novels 
+            WHERE title LIKE ? OR nickname LIKE ? OR description LIKE ?`,
+            [searchTerm, searchTerm, searchTerm]
+        );
 
-    res.render("search", { q, result });
+        res.render("search", { q, result });
+    } catch (error) {
+        console.error("검색 DB 오류:", error);
+        res.status(500).send("검색 중 서버 오류가 발생했습니다.");
+    }
 });
 
 // 댓글 목록 + 입력 페이지
-app.get("/novel/:novelId/:episodeNumber/comments", (req, res) => {
+// 댓글 목록 + 입력 페이지
+app.get("/novel/:novelId/:episodeNumber/comments", async (req, res) => { // ⭐ async 추가
     const { novelId } = req.params;
     const episodeNumber = Number(req.params.episodeNumber);
 
-    const novelPath = path.join(__dirname, "data", "novels.json");
-    const episodePath = path.join(__dirname, "data", "episodes.json");
-    const commentPath = path.join(__dirname, "data", "comments.json");
+    try {
+        // 1. 소설 정보 조회
+        const [novelRows] = await db.query(
+            "SELECT * FROM novels WHERE novelId = ?",
+            [novelId]
+        );
+        const novel = novelRows[0];
+        if (!novel) return res.status(404).send("해당 소설을 찾을 수 없습니다.");
 
-    const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-    const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
-    const commentsAll = JSON.parse(fs.readFileSync(commentPath, "utf8"));
+        // 2. 회차 정보 조회
+        const [episodeRows] = await db.query(
+            "SELECT * FROM episodes WHERE novelId = ? AND episodeNumber = ?",
+            [novelId, episodeNumber]
+        );
+        const episode = episodeRows[0];
+        if (!episode) return res.status(404).send("해당 회차를 찾을 수 없습니다.");
 
-    const episode = episodes.find(
-        (ep) =>
-            ep.novelId === novelId && Number(ep.episodeNumber) === episodeNumber
-    );
-    if (!episode) return res.status(404).send("해당 회차를 찾을 수 없습니다.");
+        // 3. 해당 회차 댓글 조회 (작성 시간 순 오름차순)
+        const [episodeComments] = await db.query(
+            `SELECT * FROM comments 
+            WHERE novelId = ? AND episodeNumber = ? 
+            ORDER BY createdAt ASC`,
+            [novelId, episodeNumber]
+        );
 
-    const novel = novels.find((n) => n.novelId === novelId);
-    if (!novel) return res.status(404).send("해당 소설을 찾을 수 없습니다.");
+        res.render("comments", {
+            episode,
+            novel,
+            comments: episodeComments,
+            user: req.session.user,
+        });
 
-    const episodeComments = commentsAll
-        .filter(
-            (c) =>
-                c.novelId === novelId &&
-                Number(c.episodeNumber) === episodeNumber
-        )
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
-    res.render("comments", {
-        episode,
-        novel,
-        comments: episodeComments,
-        user: req.session.user,
-    });
+    } catch (error) {
+        console.error("댓글 목록 DB 오류:", error);
+        res.status(500).send("댓글 목록 로딩 중 서버 오류가 발생했습니다.");
+    }
 });
-
 ///////////좋아요 코드
 
-app.post("/like", requireLogin, (req, res) => {
+app.post("/like", requireLogin, async (req, res) => { // ⭐ async 추가
     const { novelId } = req.body;
+    const currentUserId = req.session.user.id;
+    
+    // 트랜잭션 시작 (좋아요 추가/삭제 및 카운트 업데이트를 안전하게 처리)
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
 
-    const likesPath = path.join(__dirname, "data", "likes.json");
-    const novelsPath = path.join(__dirname, "data", "novels.json");
+        // 1. 현재 좋아요 상태 확인
+        const [likeRows] = await connection.query(
+            "SELECT * FROM likes WHERE novelId = ? AND userId = ?",
+            [novelId, currentUserId]
+        );
 
-    const likes = JSON.parse(fs.readFileSync(likesPath, "utf8"));
-    const novels = JSON.parse(fs.readFileSync(novelsPath, "utf8"));
+        let likedStatus = false;
+        let newLikesCount = 0;
 
-    const key = `${novelId}_${req.session.user.id}`;
+        if (likeRows.length > 0) {
+            // 좋아요 취소 (DELETE)
+            await connection.query(
+                "DELETE FROM likes WHERE novelId = ? AND userId = ?",
+                [novelId, currentUserId]
+            );
+            // 소설 좋아요 카운트 감소 (UPDATE)
+            await connection.query(
+                "UPDATE novels SET likes = likes - 1 WHERE novelId = ?",
+                [novelId]
+            );
+            likedStatus = false;
+        } else {
+            // 좋아요 추가 (INSERT)
+            await connection.query(
+                "INSERT INTO likes (novelId, userId) VALUES (?, ?)",
+                [novelId, currentUserId]
+            );
+            // 소설 좋아요 카운트 증가 (UPDATE)
+            await connection.query(
+                "UPDATE novels SET likes = likes + 1 WHERE novelId = ?",
+                [novelId]
+            );
+            likedStatus = true;
+        }
 
-    // 🔥 좋아요 토글
-    if (likes[key]) {
-        // 좋아요 취소
-        delete likes[key];
+        // 2. 변경된 좋아요 카운트 다시 조회
+        const [novelUpdateRows] = await connection.query(
+            "SELECT likes FROM novels WHERE novelId = ?",
+            [novelId]
+        );
+        newLikesCount = novelUpdateRows[0].likes;
 
-        const novel = novels.find((n) => n.novelId === novelId);
-        if (novel) novel.likes = Math.max(0, novel.likes - 1);
+        await connection.commit();
+        
+        // 최종 결과 전송
+        res.json({ liked: likedStatus, likes: newLikesCount });
 
-        fs.writeFileSync(likesPath, JSON.stringify(likes, null, 2));
-        fs.writeFileSync(novelsPath, JSON.stringify(novels, null, 2));
+    } catch (error) {
+        await connection.rollback();
+        console.error("좋아요 DB 오류:", error);
+        res.status(500).json({ error: "좋아요 처리 중 서버 오류 발생" });
 
-        return res.json({ liked: false, likes: novel.likes });
-    } else {
-        // 좋아요 추가
-        likes[key] = true;
-
-        const novel = novels.find((n) => n.novelId === novelId);
-        if (novel) novel.likes += 1;
-
-        fs.writeFileSync(likesPath, JSON.stringify(likes, null, 2));
-        fs.writeFileSync(novelsPath, JSON.stringify(novels, null, 2));
-
-        return res.json({ liked: true, likes: novel.likes });
+    } finally {
+        connection.release();
     }
 });
 
 // 댓글 작성
-app.post("/novel/:novelId/:episodeNumber/comment", requireLogin, (req, res) => {
+// 댓글 작성
+app.post("/novel/:novelId/:episodeNumber/comment", requireLogin, async (req, res) => { // ⭐ async 추가
     const { novelId } = req.params;
     const episodeNumber = Number(req.params.episodeNumber);
     const { content } = req.body;
 
-    const commentPath = path.join(__dirname, "data", "comments.json");
-    const allComments = JSON.parse(fs.readFileSync(commentPath, "utf8"));
+    // 댓글 테이블 정의에 맞게 현재 시간 포맷
+    const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const newCommentId = uuid.v4();
+    const currentUserId = req.session.user.id;
+    const currentUserNickname = req.session.user.nickname;
 
-    const newComment = {
-        id: uuid.v4(),
-        novelId,
-        episodeNumber,
-        userId: req.session.user.id,
-        nickname: req.session.user.nickname,
-        content: content.trim(),
-        likes: 0,
-        parentId: null,
-        createdAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
-    };
+    try {
+        // 1. 댓글을 comments 테이블에 삽입
+        await db.query(
+            `INSERT INTO comments 
+            (id, novelId, episodeNumber, userId, nickname, content, likes, parentId, createdAt) 
+            VALUES (?, ?, ?, ?, ?, ?, 0, NULL, ?)`,
+            [
+                newCommentId,
+                novelId,
+                episodeNumber,
+                currentUserId,
+                currentUserNickname,
+                content.trim(),
+                timestamp,
+            ]
+        );
 
-    allComments.push(newComment);
-    fs.writeFileSync(commentPath, JSON.stringify(allComments, null, 2));
-
-    res.redirect(`/novel/${novelId}/${episodeNumber}/comments#comments`);
+        res.redirect(`/novel/${novelId}/${episodeNumber}/comments#comments`);
+    } catch (error) {
+        console.error("댓글 작성 DB 오류:", error);
+        res.status(500).send("댓글 작성 중 서버 오류가 발생했습니다.");
+    }
 });
 
 /* -------------------- 5. 서버 실행 -------------------- */
