@@ -1259,9 +1259,9 @@ app.post(
         }
 
         // 3. 에피소드 데이터 수정
-        // ✅ [핵심 수정] 폼에서 받은 'title'을 원래의 필드 이름인 'episodeTitle'에 저장합니다.
         currentEpisode.episodeTitle = title; 
         currentEpisode.content = content;
+        // ✅ 수정됨: 에피소드가 실제로 수정되었으므로, updatedAt을 최신 시간으로 업데이트합니다.
         currentEpisode.updatedAt = new Date().toISOString(); 
 
         // 4. 파일에 저장
@@ -1318,13 +1318,17 @@ app.post("/addepisode", requireLogin, (req, res) => {
     const novelEpisodes = episodes.filter((ep) => ep.novelId === novelId);
     const nextEpisodeNumber = novelEpisodes.length + 1;
 
+    // 타임스탬프를 한 번만 생성하여 createdAt과 updatedAt에 사용
+    const timestamp = new Date().toISOString();
+
     const newEpisode = {
         id: uuid.v4(),
         novelId,
         episodeNumber: nextEpisodeNumber,
         episodeTitle: episodeTitle.trim(),
         content: content.trim(),
-        createdAt: new Date().toISOString(),
+        createdAt: timestamp, // 생성 시간 기록
+        updatedAt: timestamp, // ✅ 추가: 수정 시간 초기화 (생성 시간과 동일)
     };
 
     episodes.push(newEpisode);

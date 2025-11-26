@@ -5,7 +5,8 @@
     "episodeNumber": 1,
     "episodeTitle": "낯선 마을의 밤",
     "content": "달빛이 내리던 밤, 그녀는 낯선 마을의 광장에 서 있었다. 누구도 그녀의 이름을 몰랐다.",
-    "createdAt": "2025-11-10"
+    "createdAt": "2025-11-10",
+    "updatedAt": null
   },
   {
     "id": "e_002",
@@ -13,7 +14,8 @@
     "episodeNumber": 2,
     "episodeTitle": "잃어버린 약속",
     "content": "그가 떠난 후, 그녀는 매일 같은 자리에 서서 달을 올려다보았다.",
-    "createdAt": "2025-11-11"
+    "createdAt": "2025-11-11",
+    "updatedAt": null
   },
   {
     "id": "e_003",
@@ -21,7 +23,8 @@
     "episodeNumber": 3,
     "episodeTitle": "붉은 새벽의 그림자",
     "content": "어둠 속에서 달려온 그림자는 그녀를 이름으로 불렀다.",
-    "createdAt": "2025-11-12"
+    "createdAt": "2025-11-12",
+    "updatedAt": null
   },
   {
     "id": "e_004",
@@ -29,7 +32,8 @@
     "episodeNumber": 4,
     "episodeTitle": "달빛의 맹세",
     "content": "그녀는 손에 잡은 목걸이를 하늘로 들어 올렸다. 빛이 흩어지며 맹세가 새겨졌다.",
-    "createdAt": "2025-11-13"
+    "createdAt": "2025-11-13",
+    "updatedAt": null
   },
   {
     "id": "e_005",
@@ -37,7 +41,8 @@
     "episodeNumber": 1,
     "episodeTitle": "시간의 틈새",
     "content": "학교 시계가 멈춘 순간, 그녀의 세계는 전혀 다른 방향으로 흘러가기 시작했다.",
-    "createdAt": "2025-10-01"
+    "createdAt": "2025-10-01",
+    "updatedAt": null
   },
   {
     "id": "e_006",
@@ -45,7 +50,8 @@
     "episodeNumber": 2,
     "episodeTitle": "잊혀진 기억의 조각",
     "content": "그녀는 미래의 자신을 만났지만, 아무 말도 할 수 없었다.",
-    "createdAt": "2025-10-02"
+    "createdAt": "2025-10-02",
+    "updatedAt": null
   },
   {
     "id": "e_007",
@@ -53,7 +59,8 @@
     "episodeNumber": 3,
     "episodeTitle": "반복되는 하루",
     "content": "매일 아침 같은 종소리, 같은 대화, 같은 햇살. 그러나 오늘은 무언가 다르다.",
-    "createdAt": "2025-10-03"
+    "createdAt": "2025-10-03",
+    "updatedAt": null
   },
   {
     "id": "e_008",
@@ -61,7 +68,8 @@
     "episodeNumber": 4,
     "episodeTitle": "끝나지 않는 여정",
     "content": "그녀는 시간의 고리를 끊기 위해 마지막 결정을 내린다.",
-    "createdAt": "2025-10-04"
+    "createdAt": "2025-10-04",
+    "updatedAt": null
   },
   {
     "id": "e_009",
@@ -69,7 +77,8 @@
     "episodeNumber": 1,
     "episodeTitle": "검은 별의 탄생",
     "content": "모든 별이 사라진 하늘 아래, 하나의 검은 별이 태어났다.",
-    "createdAt": "2025-11-01"
+    "createdAt": "2025-11-01",
+    "updatedAt": null
   },
   {
     "id": "e_010",
@@ -77,7 +86,8 @@
     "episodeNumber": 2,
     "episodeTitle": "어둠 속의 계약",
     "content": "그는 어둠에게 이름을 빌려주었다. 대가로 영원을 얻었다.",
-    "createdAt": "2025-11-05"
+    "createdAt": "2025-11-05",
+    "updatedAt": null
   },
   {
     "id": "e_011",
@@ -85,7 +95,8 @@
     "episodeNumber": 3,
     "episodeTitle": "파멸의 서약",
     "content": "검은 별이 다시 깨어날 때, 세상은 붉게 물든다.",
-    "createdAt": "2025-11-06"
+    "createdAt": "2025-11-06",
+    "updatedAt": null
   },
   {
     "id": "e_012",
@@ -93,7 +104,8 @@
     "episodeNumber": 1,
     "episodeTitle": "유언의 봉인",
     "content": "늙은 마법사는 마지막 제자에게 조용히 봉인을 맡겼다.",
-    "createdAt": "2025-11-06"
+    "createdAt": "2025-11-06",
+    "updatedAt": null
   },
   {
     "id": "e_013",
@@ -101,7 +113,8 @@
     "episodeNumber": 2,
     "episodeTitle": "마력의 균열",
     "content": "그녀의 손끝에서 새어나온 푸른 불꽃은 세상을 바꾸었다.",
-    "createdAt": "2025-11-08"
+    "createdAt": "2025-11-08",
+    "updatedAt": null
   },
   {
     "id": "e_014",
@@ -109,7 +122,8 @@
     "episodeNumber": 3,
     "episodeTitle": "금지된 주문",
     "content": "그녀는 스승의 유언을 어기고, 봉인을 풀어버렸다.",
-    "createdAt": "2025-11-09"
+    "createdAt": "2025-11-09",
+    "updatedAt": null
   },
   {
     "id": "e_015",
@@ -117,7 +131,8 @@
     "episodeNumber": 1,
     "episodeTitle": "왕국의 몰락",
     "content": "불타는 성벽 위에서, 마지막 왕이 검을 들었다.",
-    "createdAt": "2025-09-30"
+    "createdAt": "2025-09-30",
+    "updatedAt": null
   },
   {
     "id": "e_016",
@@ -125,7 +140,8 @@
     "episodeNumber": 2,
     "episodeTitle": "계승자의 귀환",
     "content": "폐허 속에서 새로운 왕의 발자국이 들려왔다.",
-    "createdAt": "2025-10-01"
+    "createdAt": "2025-10-01",
+    "updatedAt": null
   },
   {
     "id": "e_017",
@@ -133,7 +149,8 @@
     "episodeNumber": 3,
     "episodeTitle": "불멸의 검",
     "content": "왕의 손에 들린 검은 천 년의 기억을 품고 있었다.",
-    "createdAt": "2025-10-02"
+    "createdAt": "2025-10-02",
+    "updatedAt": null
   },
   {
     "id": "e_018",
@@ -141,7 +158,8 @@
     "episodeNumber": 1,
     "episodeTitle": "차원의 문",
     "content": "소년은 오래된 금속문 앞에서 망설였다. 문 너머엔 또 다른 세계가 있었다.",
-    "createdAt": "2025-11-09"
+    "createdAt": "2025-11-09",
+    "updatedAt": null
   },
   {
     "id": "e_019",
@@ -149,7 +167,8 @@
     "episodeNumber": 2,
     "episodeTitle": "새로운 세계",
     "content": "차원을 넘은 그곳엔 인간도, 괴물도 아닌 존재들이 살고 있었다.",
-    "createdAt": "2025-11-10"
+    "createdAt": "2025-11-10",
+    "updatedAt": null
   },
   {
     "id": "e_020",
@@ -157,7 +176,8 @@
     "episodeNumber": 3,
     "episodeTitle": "포탈의 비밀",
     "content": "소년은 포탈의 문양 속에서 자신과 같은 얼굴을 보았다.",
-    "createdAt": "2025-11-11"
+    "createdAt": "2025-11-11",
+    "updatedAt": null
   },
   {
     "id": "e_021",
@@ -165,7 +185,8 @@
     "episodeNumber": 1,
     "episodeTitle": "기계의 심장",
     "content": "그녀의 가슴 속에서 금속음이 울렸다. 그것이 심장의 박동이었다.",
-    "createdAt": "2025-11-03"
+    "createdAt": "2025-11-03",
+    "updatedAt": null
   },
   {
     "id": "e_022",
@@ -173,7 +194,8 @@
     "episodeNumber": 2,
     "episodeTitle": "AI의 고백",
     "content": "그녀는 인간보다 더 인간답게 사랑을 배워갔다.",
-    "createdAt": "2025-11-04"
+    "createdAt": "2025-11-04",
+    "updatedAt": null
   },
   {
     "id": "e_023",
@@ -181,7 +203,8 @@
     "episodeNumber": 3,
     "episodeTitle": "프로토콜 23",
     "content": "인공지능 금지령이 내려진 날, 그녀는 탈출을 결심했다.",
-    "createdAt": "2025-11-05"
+    "createdAt": "2025-11-05",
+    "updatedAt": null
   },
   {
     "id": "e_024",
@@ -189,7 +212,8 @@
     "episodeNumber": 1,
     "episodeTitle": "정원의 그림자",
     "content": "꽃잎 아래 숨겨진 그림자는 생명을 빨아들이고 있었다.",
-    "createdAt": "2025-10-15"
+    "createdAt": "2025-10-15",
+    "updatedAt": null
   },
   {
     "id": "e_025",
@@ -197,7 +221,8 @@
     "episodeNumber": 2,
     "episodeTitle": "밤의 정원사",
     "content": "그림자를 가꾸는 남자의 손에는 피가 묻어 있었다.",
-    "createdAt": "2025-10-16"
+    "createdAt": "2025-10-16",
+    "updatedAt": null
   },
   {
     "id": "e_026",
@@ -205,7 +230,8 @@
     "episodeNumber": 3,
     "episodeTitle": "마지막 꽃",
     "content": "정원이 사라진 그날, 단 하나의 꽃만이 남았다.",
-    "createdAt": "2025-10-18"
+    "createdAt": "2025-10-18",
+    "updatedAt": null
   },
   {
     "id": "e_027",
@@ -213,7 +239,8 @@
     "episodeNumber": 5,
     "episodeTitle": "사라진 마을의 비밀",
     "content": "그녀가 떠난 다음 날, 마을은 지도에서 사라졌다.",
-    "createdAt": "2025-11-14"
+    "createdAt": "2025-11-14",
+    "updatedAt": null
   },
   {
     "id": "e_028",
@@ -221,7 +248,8 @@
     "episodeNumber": 5,
     "episodeTitle": "끝의 시작",
     "content": "모든 시간이 멈춘 순간, 그녀는 처음으로 울었다.",
-    "createdAt": "2025-10-05"
+    "createdAt": "2025-10-05",
+    "updatedAt": null
   },
   {
     "id": "e_029",
@@ -229,7 +257,8 @@
     "episodeNumber": 4,
     "episodeTitle": "별의 심장",
     "content": "검은 별의 중심에는 아직 살아 있는 인간의 심장이 있었다.",
-    "createdAt": "2025-11-07"
+    "createdAt": "2025-11-07",
+    "updatedAt": null
   },
   {
     "id": "e_030",
@@ -237,7 +266,8 @@
     "episodeNumber": 4,
     "episodeTitle": "마법의 계승자",
     "content": "새로운 제자가 스승의 지팡이를 손에 쥐었다.",
-    "createdAt": "2025-11-10"
+    "createdAt": "2025-11-10",
+    "updatedAt": null
   },
   {
     "id": "e_031",
@@ -245,7 +275,8 @@
     "episodeNumber": 4,
     "episodeTitle": "왕의 귀환",
     "content": "잃어버린 왕좌가 다시 불을 밝혔다.",
-    "createdAt": "2025-10-03"
+    "createdAt": "2025-10-03",
+    "updatedAt": null
   },
   {
     "id": "e_032",
@@ -253,7 +284,8 @@
     "episodeNumber": 4,
     "episodeTitle": "이세계의 적",
     "content": "소년은 자신이 구할 세계와 싸워야 했다.",
-    "createdAt": "2025-11-12"
+    "createdAt": "2025-11-12",
+    "updatedAt": null
   },
   {
     "id": "e_033",
@@ -261,7 +293,8 @@
     "episodeNumber": 4,
     "episodeTitle": "마지막 시스템",
     "content": "그녀의 의식이 끊기기 직전, 하나의 신호가 전송되었다.",
-    "createdAt": "2025-11-06"
+    "createdAt": "2025-11-06",
+    "updatedAt": null
   },
   {
     "id": "e_034",
@@ -269,7 +302,8 @@
     "episodeNumber": 4,
     "episodeTitle": "잊혀진 정원",
     "content": "그림자가 사라진 자리엔 새 생명이 피어나고 있었다.",
-    "createdAt": "2025-10-20"
+    "createdAt": "2025-10-20",
+    "updatedAt": null
   },
   {
     "id": "e_035",
@@ -277,7 +311,8 @@
     "episodeNumber": 6,
     "episodeTitle": "달의 이면",
     "content": "그녀는 달의 뒤편에서 잊혀진 도시를 보았다.",
-    "createdAt": "2025-11-15"
+    "createdAt": "2025-11-15",
+    "updatedAt": null
   },
   {
     "id": "e_036",
@@ -285,7 +320,8 @@
     "episodeNumber": 5,
     "episodeTitle": "암흑의 왕",
     "content": "모든 별이 사라질 때, 진짜 왕이 돌아온다.",
-    "createdAt": "2025-11-08"
+    "createdAt": "2025-11-08",
+    "updatedAt": null
   },
   {
     "id": "e_037",
@@ -293,7 +329,8 @@
     "episodeNumber": 5,
     "episodeTitle": "마법의 심장",
     "content": "그녀는 봉인의 중심에서 새로운 생명을 느꼈다.",
-    "createdAt": "2025-11-11"
+    "createdAt": "2025-11-11",
+    "updatedAt": null
   },
   {
     "id": "e_038",
@@ -301,7 +338,8 @@
     "episodeNumber": 5,
     "episodeTitle": "포탈의 붕괴",
     "content": "차원의 균열이 폭발하며, 세계는 다시 하나가 되었다.",
-    "createdAt": "2025-11-13"
+    "createdAt": "2025-11-13",
+    "updatedAt": null
   },
   {
     "id": "e_039",
@@ -309,7 +347,8 @@
     "episodeNumber": 5,
     "episodeTitle": "인류의 선택",
     "content": "인간들은 AI와의 공존을 선택했다. 그것은 또 다른 진화의 시작이었다.",
-    "createdAt": "2025-11-07"
+    "createdAt": "2025-11-07",
+    "updatedAt": null
   },
   {
     "id": "e_040",
@@ -317,15 +356,8 @@
     "episodeNumber": 5,
     "episodeTitle": "정원의 부활",
     "content": "수백 년이 지난 후, 한 아이가 다시 꽃씨를 심었다.",
-    "createdAt": "2025-10-22"
-  },
-  {
-    "id": "5a352211-8875-4d48-97cb-7fab8c315698",
-    "novelId": "14a4d568-10a6-488c-a143-355f0d52728d",
-    "episodeNumber": 1,
-    "episodeTitle": "테스트 회차",
-    "content": "테스트 내용",
-    "createdAt": "2025-11-17T05:52:39.587Z"
+    "createdAt": "2025-10-22",
+    "updatedAt": null
   },
   {
     "id": "30546f98-aec5-4023-a619-ed720d1c4708",
@@ -334,16 +366,16 @@
     "episodeTitle": "수정 후",
     "content": "수정 후11",
     "createdAt": "2025-11-19T06:30:33.285Z",
-    "title": "수정 후",
-    "updatedAt": "2025-11-20T10:52:36.671Z"
+    "updatedAt": "2025-11-26T08:15:17.257Z"
   },
   {
     "id": "44fc735d-54ad-4858-8802-03b60911d5ed",
     "novelId": "a8faeed3-681c-4cbd-99bb-5f0c17605bba",
     "episodeNumber": 2,
-    "episodeTitle": "테스트1",
-    "content": "테스트1",
-    "createdAt": "2025-11-19T06:32:09.226Z"
+    "episodeTitle": "수정후 타이틀 바뀌는지 확인",
+    "content": "수정 후 타이틀 바뀌는지 확인",
+    "createdAt": "2025-11-19T06:32:09.226Z",
+    "updatedAt": "2025-11-26T06:24:36.114Z"
   },
   {
     "id": "3e254e13-e7d2-4187-9f68-c0c507d8c586",
@@ -351,16 +383,16 @@
     "episodeNumber": 3,
     "episodeTitle": "테스트1",
     "content": "테스트2",
-    "createdAt": "2025-11-20T04:39:32.623Z"
+    "createdAt": "2025-11-20T04:39:32.623Z",
+    "updatedAt": null
   },
   {
-    "id": "e4da3fc5-f52e-4ccc-a171-639a199f819e",
+    "id": "af27a520-ee90-4bf6-bb44-a6e5ad6f0d27",
     "novelId": "a8faeed3-681c-4cbd-99bb-5f0c17605bba",
     "episodeNumber": 4,
-    "episodeTitle": "테스트2",
-    "content": "수정 후 테스트",
-    "createdAt": "2025-11-20T04:40:01.570Z",
-    "title": "수정 후 ",
-    "updatedAt": "2025-11-20T05:39:12.742Z"
+    "episodeTitle": "회차작성 테스트",
+    "content": "회차작성 테스트",
+    "createdAt": "2025-11-26T06:38:31.187Z",
+    "updatedAt": "2025-11-26T06:38:31.187Z"
   }
 ]
