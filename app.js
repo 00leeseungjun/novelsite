@@ -1,514 +1,4 @@
-// const path = require("path");
 
-// const fs = require("fs");
-
-// const express = require("express");
-
-// const app = express();
-
-// const bcrypt = require("bcrypt");
-
-// const session = require("express-session");
-
-// const uuid = require("uuid");
-
-// app.use(express.static("pages"));
-
-// app.use(express.urlencoded({ extended: true }));
-
-// app.use((req, res, next) => {
-//     res.locals.user = req.session.user;
-//     next();
-// });
-
-// function requireLogin(req, res, next) {
-//     if (!req.session.user) {
-//         return res.redirect("/login");
-//     }
-//     next();
-// }
-
-// app.use(session({
-//     secret: "secret-key-strong",   // 나중에 강하게 바꿔
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//         maxAge: 1000 * 60 * 60 * 2 // 2시간 유지
-//     }
-// }));
-
-// // app.get("/mynovel", requireLogin, (req, res) => {
-// //     res.render("mynovel", { user: req.session.user });
-// // });
-
-// app.get("/mynovel", requireLogin, (req, res) => {
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     // 로그인한 사람 ID
-//     const loginUserId = req.session.user.id;
-
-//     // 로그인한 사람이 쓴 소설만 필터링
-//     const myNovels = novels.filter(novel => novel.userId === loginUserId);
-
-//     res.render("mynovel", { user: req.session.user, novels: myNovels });
-// });
-
-// // 모든 페이지에서 쓸 수 있게
-
-// //로그아웃
-// app.get("/logout", (req, res) => {
-//     req.session.destroy(() => {
-//         res.redirect("/main");
-//     });
-// });
-
-// app.post("/login", async (req, res) => {
-//     const { id, password } = req.body;
-
-//     const userPath = path.join(__dirname, "data", "users.json");
-//     const users = JSON.parse(fs.readFileSync(userPath, "utf8"));
-
-//     const user = users.find(u => u.id === id);
-//     if (!user) {
-//         return res.send("❌ 존재하지 않는 아이디입니다.");
-//     }
-
-//     // 비밀번호 비교
-//     const match = await bcrypt.compare(password, user.password);
-//     if (!match) {
-//         return res.send("❌ 비밀번호가 틀렸습니다.");
-//     }
-
-//     // 🔥 로그인 성공 → 세션에 저장
-//     req.session.user = {
-//         id: user.id,
-//         nickname: user.nickname
-//     };
-
-//     res.redirect("/main");
-// });
-
-// app.set("view engine", "ejs");
-// app.set("views", path.join(__dirname, "pages")); // ejs 파일들이 들어있는 폴더
-
-// // app.get("/main", function (req, res) {
-// //     res.render("index", {});
-// // });
-
-// // app.get("/main", function (req, res) {
-// //     const novelPath = path.join(__dirname, "data", "novels.json");
-// //     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-// //     // ✅ likes 기준 내림차순 정렬 (많은 순 → 적은 순)
-// //     const sortedNovels = [...novels].sort((a, b) => {
-// //         const likesA = typeof a.likes === "number" ? a.likes : 0;
-// //         const likesB = typeof b.likes === "number" ? b.likes : 0;
-// //         return likesB - likesA; // 내림차순
-// //     });
-
-// //     res.render("index", { novels: sortedNovels });
-// // });
-
-// // app.get("/main", function (req, res) {
-// //     const novelPath = path.join(__dirname, "data", "novels.json");
-// //     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-// //     const sortedNovels = [...novels].sort((a, b) => {
-// //         const likesA = typeof a.likes === "number" ? a.likes : 0;
-// //         const likesB = typeof b.likes === "number" ? b.likes : 0;
-// //         return likesB - likesA;
-// //     });
-
-// //     // ✅ 연재중인 것만
-// //     const ongoingNovels = sortedNovels.filter(
-// //         (n) => n.status === "연재중"
-// //     );
-
-// //     res.render("index", {
-// //         novels: sortedNovels,   // 전체용
-// //         ongoingNovels           // 연재용
-// //     });
-// // });
-
-// app.get("/main", function (req, res) {
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     const sortedNovels = [...novels].sort((a, b) => {
-//         const likesA = typeof a.likes === "number" ? a.likes : 0;
-//         const likesB = typeof b.likes === "number" ? b.likes : 0;
-//         return likesB - likesA;
-//     });
-
-//     const ongoingNovels = sortedNovels.filter(n => n.status === "연재중");
-//     const completedNovels = sortedNovels.filter(n => n.status === "완결");
-
-//     res.render("index", {
-//         novels: sortedNovels,
-//         ongoingNovels,
-//         completedNovels
-//     });
-// });
-
-// app.get("/login", function (req, res) {
-//     res.render("login", {});
-// });
-
-// app.post("/signup", async (req, res) => {
-//     const { id, email, password, nickname } = req.body;
-
-//     // 데이터 파일 경로
-//     const userPath = path.join(__dirname, "data", "users.json");
-
-//     // 기존 유저 데이터 가져오기
-//     const fileData = fs.readFileSync(userPath, "utf8");
-//     const users = JSON.parse(fileData);
-
-//     // 1) 이미 같은 id가 존재하는지 체크
-//     const exists = users.find(user => user.id === id);
-//     if (exists) {
-//         return res.status(400).send("이미 사용중인 아이디입니다.");
-//     }
-
-//     // 2) 비밀번호 해싱
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     // 3) 새로운 유저 정보 생성
-//     const newUser = {
-//         id,
-//         email,
-//         password: hashedPassword,
-//         nickname
-//     };
-
-//     // 4) users.json에 저장
-//     users.push(newUser);
-//     fs.writeFileSync(userPath, JSON.stringify(users, null, 2));
-
-//     res.send("회원가입 성공!");
-// });
-
-// app.get("/signup", function (req, res) {
-//     res.render("signup", {});
-// });
-
-// // app.get("/allnovel", function (req, res) {
-// //     res.render("allnovel", {});
-// // });
-
-// app.get("/comment", function (req, res) {
-//     res.render("comment", {});
-// });
-
-// app.get("/comment1", function (req, res) {
-//     res.render("comment copy", {});
-// });
-
-// app.get("/comment2", function (req, res) {
-//     res.render("comment copy2", {});
-// });
-
-// // app.get("/complete", function (req, res) {
-// //     res.render("complete", {});
-// // });
-
-// app.get("/complete", function (req, res) {
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     const completedNovels = novels.filter(
-//         (n) => n.status === "완결"
-//     );
-
-//     res.render("complete", { completedNovels });
-// });
-
-// app.get("/writer", function (req, res) {
-//     res.render("writer", {});
-// });
-
-// // app.get("/content", function (req, res) {
-// //     res.render("content", {});
-// // });
-
-// // app.get("/live", function (req, res) {
-// //     res.render("live", {});
-// // });
-
-// app.get("/live", function (req, res) {
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     const ongoingNovels = novels.filter(
-//         (n) => n.status === "연재중"
-//     );
-
-//     res.render("live", { novels: ongoingNovels });
-// });
-
-// app.get("/managenovel", function (req, res) {
-//     res.render("managenovel", {});
-// });
-
-// app.get("/mynovel", function (req, res) {
-//     res.render("mynovel", {});
-// });
-
-// app.get("/novel/:novelId/:episodeNumber/comments", function (req, res) {
-//     const { novelId } = req.params;
-//     const episodeNumber = Number(req.params.episodeNumber);
-
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const episodePath = path.join(__dirname, "data", "episodes.json");
-//     const commentPath = path.join(__dirname, "data", "comments.json");
-
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-//     const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
-//     const commentsAll = JSON.parse(fs.readFileSync(commentPath, "utf8"));
-
-//     const episode = episodes.find(
-//         (ep) => ep.novelId === novelId && Number(ep.episodeNumber) === episodeNumber
-//     );
-//     if (!episode) return res.status(404).send("해당 회차를 찾을 수 없습니다.");
-
-//     const novel = novels.find((n) => n.novelId === novelId);
-//     if (!novel) return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-
-//     // ✅ 이 회차에 해당하는 댓글들만 필터
-//     const episodeComments = commentsAll
-//         .filter(
-//             (c) =>
-//                 c.novelId === novelId &&
-//                 Number(c.episodeNumber) === episodeNumber
-//         )
-//         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); // 또는 좋아요순
-
-//     res.render("comments", { episode, novel, comments: episodeComments, user: req.session.user  });
-// });
-
-// app.post("/novel/:novelId/:episodeNumber/comment", requireLogin, (req, res) => {
-//     const { novelId } = req.params;
-//     const episodeNumber = Number(req.params.episodeNumber);
-//     const { content } = req.body;
-
-//     const commentPath = path.join(__dirname, "data", "comments.json");
-//     const allComments = JSON.parse(fs.readFileSync(commentPath, "utf8"));
-
-//     const newComment = {
-//         id: uuid.v4(),
-//         novelId,
-//         episodeNumber,
-//         userId: req.session.user.id,
-//         nickname: req.session.user.nickname,
-//         content: content.trim(),
-//         likes: 0,
-//         parentId: null,
-//         createdAt: new Date().toISOString()
-//     };
-
-//     allComments.push(newComment);
-//     fs.writeFileSync(commentPath, JSON.stringify(allComments, null, 2));
-
-//     // 🔥 댓글 페이지로 리다이렉트
-//     res.redirect(`/novel/${novelId}/${episodeNumber}/comments#comments`);
-// });
-
-// app.get("/novel/:novelId/:episodeNumber", function (req, res) {
-//     const { novelId } = req.params;
-//     const episodeNumber = Number(req.params.episodeNumber); // ← 숫자로
-
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const episodePath = path.join(__dirname, "data", "episodes.json");
-
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-//     const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
-
-//     // novelId + episodeNumber 동시 매칭
-//     const episode = episodes.find(
-//         (ep) =>
-//             ep.novelId === novelId && Number(ep.episodeNumber) === episodeNumber
-//     );
-//     if (!episode) return res.status(404).send("해당 회차를 찾을 수 없습니다.");
-
-//     // 작품 정보도 함께 전달 (작품홈 링크/표시용)
-//     const novel = novels.find((n) => n.novelId === novelId);
-//     if (!novel) return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-
-//     res.render("episodes", { episode, novel, user: req.session.user});
-// });
-
-// // app.get("/novel/:novelId/:episodeNumber", function (req, res) {
-// //     const novelId = req.params.novelId; // ex) novel_004
-// //     const episodeNumber = req.params.episodeNumber;
-
-// //     const novelPath = path.join(__dirname, "data", "novels.json");
-// //     const episodePath = path.join(__dirname, "data", "episodes.json");
-
-// //     // JSON 파일 읽기
-// //     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-// //     const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
-
-// //     // 소설 정보 찾기
-// //     const episode = episodes.find((n) => n.episodeNumber === episodeNumber);
-// //     if (!episode) {
-// //         return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-// //     }
-
-// //     // EJS로 렌더링
-// //     res.render("episodes", { episode });
-// // });
-
-// // app.get("/novel/:id", function (req, res) {
-// //     const novelId = req.params.id;
-// //     const filePath = path.join(__dirname, "data", "novels.json");
-// //     // 1. JSON 파일에서 데이터 읽기 (try/catch 없이 단순화)
-// //     // NOTE: 만약 파일이 없거나 JSON 형식이 잘못된 경우 서버가 충돌할 수 있습니다.
-// //     const fileData = fs.readFileSync(filePath, "utf8");
-// //     const storednovels = JSON.parse(fileData); // 배열 형태일 것으로 가정
-
-// //     for (const novel of storednovels) {
-// //         if (novel.id === novelId) {
-// //             return res.render("novel", { novel: novel });
-// //         }
-// //     }
-// //     res.render("404");
-// // });
-
-// app.get("/novel/:novelId", function (req, res) {
-//     const novelId = req.params.novelId; // ex) novel_004
-
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const episodePath = path.join(__dirname, "data", "episodes.json");
-
-//     // JSON 파일 읽기
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-//     const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
-
-//     // 소설 정보 찾기
-//     const novel = novels.find((n) => n.novelId === novelId);
-//     if (!novel) {
-//         return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-//     }
-
-//     // 해당 소설의 모든 회차 불러오기
-//     const novelEpisodes = episodes
-//         .filter((ep) => ep.novelId === novelId)
-//         .sort((a, b) => a.episodeNumber - b.episodeNumber); // 회차 순서대로 정렬
-
-//     // EJS로 렌더링
-//     res.render("novel", { novel, episodes: novelEpisodes });
-// });
-
-// // app.get("/novel", function (req, res) {
-// //     res.render("novel", {});
-// // });
-
-// app.get("/write", function (req, res) {
-//     res.render("write", {});
-// });
-
-// // app.get("/novel/:id", function (req, res) {
-// //     const id = req.params.id; // URL의 id값 ex) 4
-// //     const filePath = path.join(__dirname, "data", "novels.json");
-
-// //     // 파일 읽고 JSON 파싱
-// //     const fileData = fs.readFileSync(filePath, "utf8");
-// //     const novels = JSON.parse(fileData);
-
-// //     // 배열에서 해당 id 찾기
-// //     const novel = novels.find((n) => n.id === id);
-
-// //     if (!novel) {
-// //         // id가 없으면 404 처리
-// //         return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-// //     }
-
-// //     // ✅ allnovel.ejs 또는 novel-detail.ejs 렌더
-// //     res.render("novel", { novel }); // novel이라는 변수명으로 EJS에 전달
-// // });
-
-// // app.get("/novel/:novelId", function (req, res) {
-// //     const novelId = req.params.novelId;
-// //     const filePath = path.join(__dirname, "data", "novels.json");
-
-// //     const fileData = fs.readFileSync(filePath, "utf8");
-// //     const novels = JSON.parse(fileData);
-
-// //     // novelId 기준으로 찾기
-// //     const novel = novels.find((n) => n.novelId === novelId);
-
-// //     if (!novel) {
-// //         return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-// //     }
-
-// //     res.render("novel", { novel });
-// // });
-
-// app.get("/allnovel", function (req, res) {
-//     const filePath = path.join(__dirname, "data", "novels.json"); //
-//     const fileData = fs.readFileSync(filePath, "utf8"); //json 파일 읽기
-//     const storednovels = JSON.parse(fileData); //json 파일 읽기
-
-//     res.render("allnovel", { novels: storednovels });
-// });
-
-// // app.post("/write", function (req, res) {
-// //     const content = req.body;
-// //     content.id = uuid.v4();
-// //     const filePath = path.join(__dirname, "data", "content.json");
-
-// //     const fileData = fs.readFileSync(filePath);
-// //     const storedcontent = JSON.parse(fileData);
-
-// //     storedcontent.push(content);
-
-// //     fs.writeFileSync(filePath, JSON.stringify(storedcontent));
-
-// //     res.redirect("/content");
-// // });
-
-// // app.post("/write", function (req, res) {
-// //     const content = req.body;
-// //     const filePath = path.join(__dirname, "data", "content.json");
-
-// //     // content.json은 이미 존재하고, []로 초기화되어 있다고 가정
-// //     const fileData = fs.readFileSync(filePath, "utf8");
-// //     const storedContent = JSON.parse(fileData); // 기존 배열 읽기
-
-// //     storedContent.push(content); // 새 글 추가
-
-// //     fs.writeFileSync(filePath, JSON.stringify(storedContent, null, 2), "utf8");
-
-// //     res.send("✅ 저장 완료");
-// // });
-
-// // app.post("/write", function (req, res) {
-// //     const content = req.body;
-// //     const dataDir = path.join(__dirname, "data");
-// //     const filePath = path.join(dataDir, "content.json");
-
-// //     // ✅ 폴더와 파일이 없으면 자동 생성
-// //     if (!fs.existsSync(dataDir)) {
-// //         fs.mkdirSync(dataDir);
-// //     }
-// //     if (!fs.existsSync(filePath)) {
-// //         fs.writeFileSync(filePath, "[]", "utf8");
-// //     }
-
-// //     // ✅ 기존 파일 읽기
-// //     const fileData = fs.readFileSync(filePath, "utf8");
-// //     const storedContent = JSON.parse(fileData);
-
-// //     storedContent.push(content); // 새 글 추가
-
-// //     // ✅ 다시 파일에 저장
-// //     fs.writeFileSync(filePath, JSON.stringify(storedContent, null, 2), "utf8");
-
-// //     res.send("✅ 저장 완료");
-// // });
-
-// app.listen(3000);
 
 const path = require("path");
 const fs = require("fs");
@@ -607,17 +97,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "pages")));
 app.use("/js", express.static(path.join(__dirname, "pagea", "js")));
 
-// // 🔥 세션 미들웨어 (무조건 req.session 쓰는 것들보다 위에 있어야 함)
-// app.use(
-//     session({
-//         secret: "secret-key-strong", // 나중에 바꿔
-//         resave: false,
-//         saveUninitialized: false,
-//         cookie: {
-//             maxAge: 1000 * 60 * 60 * 2, // 2시간 유지
-//         },
-//     })
-// );
+
 
 // 🔥 모든 ejs에서 user 쓸 수 있게 (세션 다음!)
 app.use((req, res, next) => {
@@ -699,44 +179,7 @@ app.post("/signup", async (req, res) => {
     res.send("회원가입 성공!");
 });
 
-// app.post("/signup", async (req, res) => {
-//     // 1. req.body에서 새로운 'name' 필드를 비구조화 할당(Destructuring)으로 받습니다.
-//     const { id, email, password, nickname, name } = req.body; 
 
-//     // 파일 로딩 및 중복 확인 로직 (기존과 동일)
-//     const userPath = path.join(__dirname, "data", "users.json");
-//     // fs는 비동기 함수 사용을 권장하지만, 기존 로직 유지를 위해 동기 함수 사용
-//     try {
-//         const fileData = fs.readFileSync(userPath, "utf8");
-//         const users = JSON.parse(fileData);
-
-//         const exists = users.find((user) => user.id === id);
-//         if (exists) {
-//             return res.status(400).send("이미 사용중인 아이디입니다.");
-//         }
-        
-//         // 비밀번호 해시 (기존과 동일)
-//         const hashedPassword = await bcrypt.hash(password, 10);
-
-//         // 2. newUser 객체에 'name' 필드를 추가하여 데이터베이스에 저장될 구조를 완성합니다.
-//         const newUser = {
-//             id,
-//             email,
-//             password: hashedPassword,
-//             nickname,
-//             name, // <--- 추가된 필드
-//         };
-
-//         users.push(newUser);
-//         fs.writeFileSync(userPath, JSON.stringify(users, null, 2));
-
-//         res.send("회원가입 성공!");
-        
-//     } catch (error) {
-//         console.error("회원가입 처리 중 오류 발생:", error);
-//         res.status(500).send("서버 오류가 발생했습니다.");
-//     }
-// });
 
 // 로그아웃
 app.get("/logout", (req, res) => {
@@ -808,27 +251,7 @@ app.get("/mynovel", requireLogin, (req, res) => {
     res.render("mynovel", { user: req.session.user, novels: myNovels });
 });
 
-//작품 수정
-// app.get("/editnovel", requireLogin, (req, res) => {
-//     const novelId = req.query.novel;
 
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     const novel = novels.find(n => n.novelId === novelId);
-
-//     if (!novel) {
-//         return res.status(404).send("해당 작품을 찾을 수 없습니다.");
-//     }
-
-//     // 🔥 novel 데이터 전달 → edit.ejs에서 input에 값 채워짐
-//     res.render("editnovel", { novel });
-// });
-
-// 기타 단독 페이지들
-// app.get("/writer", (req, res) => {
-//     res.render("writer", {});
-// });
 
 app.get("/writer/:userId", (req, res) => {
     const userId = req.params.userId;
@@ -874,64 +297,6 @@ app.get("/editnovel", requireLogin, (req, res) => {
     res.render("editnovel", { novel });
 });
 
-// app.post("/editnovel", requireLogin, (req, res) => {
-//     const { novelId, title, description } = req.body;
-
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     const index = novels.findIndex(n => n.novelId === novelId);
-
-//     if (index === -1) {
-//         return res.status(404).send("해당 작품을 찾을 수 없습니다.");
-//     }
-
-//     // 🔥 로그인한 유저가 이 작품의 소유자인지 체크
-//     if (novels[index].userId !== req.session.user.id) {
-//         return res.status(403).send("수정 권한이 없습니다.");
-//     }
-
-//     // 데이터 수정
-//     novels[index].title = title;
-//     novels[index].description = description;
-
-//     fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
-
-//     res.redirect("/mynovel");
-// });
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// app.post("/editnovel", requireLogin, upload.single('novelCover'), (req, res) => {
-//     const { novelId, title, description } = req.body;
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     const index = novels.findIndex(n => n.novelId === novelId);
-
-//     if (index === -1) {
-//         return res.status(404).send("해당 작품을 찾을 수 없습니다.");
-//     }
-
-//     // 🔥 로그인한 유저가 이 작품의 소유자인지 체크
-//     if (novels[index].userId !== req.session.user.id) {
-//         return res.status(403).send("수정 권한이 없습니다.");
-//     }
-
-//     // 데이터 수정
-//     novels[index].title = title;
-//     novels[index].description = description;
-
-//     // 🔥 이미지 파일이 업로드된 경우, 커버 이미지 경로 업데이트
-//     if (req.file) {
-//         // req.file.filename은 Multer 설정에서 정의한 파일명입니다.
-//         // 클라이언트에서 접근 가능한 상대 경로로 저장해야 합니다.
-//         // 예: pages/uploads/novelCover-123456789.png -> /uploads/novelCover-123456789.png
-//         novels[index].coverImageUrl = `/uploads/${req.file.filename}`;
-//     }
-
-//     fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
-
-//     res.redirect("/mynovel");
-// });
 
 
 // ... (multer, requireLogin 등 다른 미들웨어는 여기에 있다고 가정)
@@ -1031,67 +396,13 @@ app.post(
         }
     }
 );
-// app.get("/addnovel", (req, res) => {
-//     res.render("addnovel", {});
-// });
+
 
 app.get("/addnovel", requireLogin, (req, res) => {
     res.render("addnovel");
 });
 
-// app.post("/addnovel", requireLogin, (req, res) => {
-//     const { title, description } = req.body;
 
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     const newNovel = {
-//         id: uuid.v4(),
-//         novelId: uuid.v4(),
-//         title,
-//         description,
-//         nickname: req.session.user.nickname,
-//         userId: req.session.user.id,
-//         status: "연재중",
-//         likes: 0,
-//     };
-
-//     novels.push(newNovel);
-
-//     fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
-
-//     res.redirect("/mynovel");
-// });
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-// app.post("/addnovel", requireLogin, upload.single('novelCover'), (req, res) => {
-//     const { title, description } = req.body;
-
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     // 🔥 커버 이미지 경로 설정
-//     const coverImageUrl = req.file
-//         ? `/uploads/${req.file.filename}`
-//         : 'https://placehold.co/160x220/e5e5e5/777?text=NO+IMAGE'; // 파일 없을 때 기본 이미지
-
-//     const newNovel = {
-//         id: uuid.v4(),
-//         novelId: uuid.v4(),
-//         title,
-//         description,
-//         nickname: req.session.user.nickname,
-//         userId: req.session.user.id,
-//         status: "연재중",
-//         likes: 0,
-//         coverImageUrl, // NEW: 커버 이미지 URL 추가
-//     };
-
-//     novels.push(newNovel);
-
-//     fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
-
-//     res.redirect("/mynovel");
-// });
 
 app.post("/addnovel", requireLogin, upload.single("novelCover"), (req, res) => {
     // 1. req.body에서 title, description, 그리고 새로 추가할 genre를 가져옵니다.
@@ -1126,33 +437,7 @@ app.post("/addnovel", requireLogin, upload.single("novelCover"), (req, res) => {
     res.redirect("/mynovel");
 });
 
-// app.post("/deletenovel", ... ) 라우터
-// app.post("/deletenovel", requireLogin, (req, res) => {
-//     const { novelId } = req.body;
 
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     let novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-
-//     const index = novels.findIndex(n => n.novelId === novelId);
-
-//     if (index === -1) {
-//         return res.status(404).send("삭제할 작품을 찾을 수 없습니다.");
-//     }
-
-//     // 🔥 소유권 확인
-//     if (novels[index].userId !== req.session.user.id) {
-//         return res.status(403).send("❌ 삭제 권한이 없습니다.");
-//     }
-
-//     // 작품 삭제 (해당 인덱스 제거)
-//     novels.splice(index, 1);
-
-//     // 💡 참고: 실제 운영 환경에서는 이 작품에 속한 에피소드, 댓글, 좋아요 데이터도 모두 삭제해야 합니다.
-
-//     fs.writeFileSync(novelPath, JSON.stringify(novels, null, 2));
-
-//     res.redirect("/mynovel");
-// });
 
 app.post("/deletenovel", requireLogin, (req, res) => {
     const { novelId } = req.body;
@@ -1262,8 +547,8 @@ app.post(
         currentEpisode.episodeTitle = title; 
         currentEpisode.content = content;
         // ✅ 수정됨: 에피소드가 실제로 수정되었으므로, updatedAt을 최신 시간으로 업데이트합니다.
-        currentEpisode.updatedAt = new Date().toISOString(); 
-
+        currentEpisode.updatedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        
         // 4. 파일에 저장
         try {
             fs.writeFileSync(episodePath, JSON.stringify(episodes, null, 2));
@@ -1289,9 +574,6 @@ app.get("/comment2", (req, res) => {
     res.render("comment copy2", {});
 });
 
-// app.get("/write", (req, res) => {
-//     res.render("write", {});
-// });
 
 app.get("/addepisode", requireLogin, (req, res) => {
     const novelId = req.query.novel;
@@ -1319,7 +601,7 @@ app.post("/addepisode", requireLogin, (req, res) => {
     const nextEpisodeNumber = novelEpisodes.length + 1;
 
     // 타임스탬프를 한 번만 생성하여 createdAt과 updatedAt에 사용
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     const newEpisode = {
         id: uuid.v4(),
@@ -1341,27 +623,7 @@ app.post("/addepisode", requireLogin, (req, res) => {
 
 /* -------------------- 4. 소설 / 회차 / 댓글 관련 라우트 -------------------- */
 
-// 작품 홈: 해당 작품의 회차 목록
-// app.get("/novel/:novelId", (req, res) => {
-//     const novelId = req.params.novelId;
 
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const episodePath = path.join(__dirname, "data", "episodes.json");
-
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-//     const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
-
-//     const novel = novels.find((n) => n.novelId === novelId);
-//     if (!novel) {
-//         return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-//     }
-
-//     const novelEpisodes = episodes
-//         .filter((ep) => ep.novelId === novelId)
-//         .sort((a, b) => a.episodeNumber - b.episodeNumber);
-
-//     res.render("novel", { novel, episodes: novelEpisodes });
-// });
 
 app.get("/novel/:novelId", (req, res) => {
     const novelId = req.params.novelId;
@@ -1399,27 +661,7 @@ app.get("/novel/:novelId", (req, res) => {
     });
 });
 
-// 회차 본문 페이지
-// app.get("/novel/:novelId/:episodeNumber", (req, res) => {
-//     const { novelId } = req.params;
-//     const episodeNumber = Number(req.params.episodeNumber);
 
-//     const novelPath = path.join(__dirname, "data", "novels.json");
-//     const episodePath = path.join(__dirname, "data", "episodes.json");
-
-//     const novels = JSON.parse(fs.readFileSync(novelPath, "utf8"));
-//     const episodes = JSON.parse(fs.readFileSync(episodePath, "utf8"));
-
-//     const episode = episodes.find(
-//         (ep) => ep.novelId === novelId && Number(ep.episodeNumber) === episodeNumber
-//     );
-//     if (!episode) return res.status(404).send("해당 회차를 찾을 수 없습니다.");
-
-//     const novel = novels.find((n) => n.novelId === novelId);
-//     if (!novel) return res.status(404).send("해당 소설을 찾을 수 없습니다.");
-
-//     res.render("episodes", { episode, novel, user: req.session.user, total });
-// });
 
 app.get("/novel/:novelId/:episodeNumber", (req, res) => {
     const { novelId } = req.params;
@@ -1579,7 +821,7 @@ app.post("/novel/:novelId/:episodeNumber/comment", requireLogin, (req, res) => {
         content: content.trim(),
         likes: 0,
         parentId: null,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
     };
 
     allComments.push(newComment);
