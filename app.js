@@ -18,6 +18,18 @@ const dbConfig = {
     queueLimit: 0,
 };
 
+
+// const dbConfig = {
+//     host: "novel-site-db.cfsq62iae7qt.ap-southeast-2.rds.amazonaws.com", // 보통 'localhost' 또는 DB 서버 주소
+//     user: "admin", // MySQL 설치 시 설정한 사용자 이름
+//     password: "Chaco4747", // 🔑 MySQL 설치 시 설정한 비밀번호
+//     database: "novel_site", // 💡 'webnovel_app' -> 'novel_site'로 변경
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0,
+// };
+
+
 // Connection Pool 생성
 const db = mysql.createPool(dbConfig);
 // --------------------------------------------------------------------------

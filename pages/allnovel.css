@@ -158,7 +158,7 @@ body {
 
 /* 개별 카드 스타일 */
 .novel-card {
-    width: 180px;
+    width: 160px;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -265,4 +265,14 @@ a {
 
 .hidden {
     display: none;
+}
+
+
+.novel-image-cover {
+    /* 카드 디자인에 맞게 너비, 높이 설정 */
+    width: 160px; 
+    height: 220px; /* 예시 높이. index.ejs와 동일하게 유지하는 것이 좋습니다. */
+    
+    /* 비율 유지하며 영역을 꽉 채우기 (크롭 발생 가능) */
+    object-fit: cover; 
 }

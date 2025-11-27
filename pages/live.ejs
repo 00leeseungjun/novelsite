@@ -11,25 +11,27 @@
         <div>
             <%- include('parts/header') %>
 
-            <!-- {/* 섹션 바: 왼쪽 '연재', 오른쪽 '더보기' */} -->
             <div class="section-bar">
                 <span class="section-title">연재중인 소설</span>
             </div>
 
-            <!-- {/* 카드 리스트 */} -->
             <div class="novel-list">
                 <% novels.forEach(novel => { %>
                     <a href="/novel/<%= novel.novelId %>">
                         <div class="novel-card">
-                            <div class="novel-image">소설 이미지</div>
+                            <img 
+                                src="<%= novel.coverImageUrl %>" 
+                                alt="<%= novel.title %> 커버 이미지"
+                                class="novel-image-cover"
+                            >
                             <div class="novel-title"><%= novel.title %></div>
                             <div class="novel-author"><%= novel.nickname %></div>
                         </div>
                     </a>
                 <% }) %>
-                
             </div>
-                
-            </div>
+            
+            
+        </div>
     </body>
 </html>

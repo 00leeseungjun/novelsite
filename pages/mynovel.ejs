@@ -17,7 +17,6 @@
                 <div class="mynovel-header">
                     <h2>📚 <%= user?.nickname || '나의' %> 작품 관리</h2>
                     <% if (novels.length > 0) { %>
-                    <!-- 작품이 있을 때만 버튼 표시 -->
                     <a href="/addnovel" class="btn-add-novel-small">
                         새 작품 등록
                     </a>
@@ -40,16 +39,18 @@
                 <div class="novel-list-container">
                     <% novels.forEach(novel => { %>
                     <div class="novelintrosection">
-                        <% if (novel.imageUrl) { %>
+                        
+                        <% if (novel.coverImageUrl) { %>
                         <img
-                            src="<%= novel.imageUrl %>"
-                            alt="<%= novel.title %> 이미지"
+                            src="<%= novel.coverImageUrl %>"
+                            alt="<%= novel.title %> 커버 이미지"
                             class="novel-image-thumb"
                         />
                         <% } else { %>
-                        <div class="novel-image">소설 이미지</div>
+                        <div class="novel-image-thumb no-image">
+                            표지 없음
+                        </div>
                         <% } %>
-
                         <div class="novel-intro">
                             <div class="novel-title">
                                 <a href="/novel/<%= novel.novelId %>"

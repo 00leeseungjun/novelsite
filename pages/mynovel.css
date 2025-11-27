@@ -288,3 +288,33 @@ a.action-manage {
     display: flex;
     flex-direction: column;
 }
+
+/* mynovel.css 파일에 추가 (예시) */
+.novel-image-thumb {
+    width: 160px; /* 원하는 썸네일 너비 지정 */
+    height: 220px; /* 원하는 썸네일 높이 지정 */
+    
+    /* 이미지가 영역을 꽉 채우고 비율을 유지하며 잘라내도록 설정 */
+    object-fit: cover; 
+    border-radius: 4px;
+}
+
+/* 이미지가 없을 때 표시되는 스타일 */
+.novel-image-thumb.no-image {
+    background-color: #eee;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+}
+
+/* 부모 컨테이너(novelintrosection)에 flex를 사용하여 레이아웃 배치 */
+.novelintrosection {
+    display: flex;
+    gap: 16px; /* 이미지와 텍스트 사이 간격 */
+    align-items: flex-start;
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}

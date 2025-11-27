@@ -15,20 +15,23 @@
                 <span class="section-title">모든 소설</span>
             </div>
 
-            <!-- {/* 카드 리스트 */} -->
             <div class="novel-list">
                 <% for (const novel of novels) { %>
                     <a href="/novel/<%= novel.novelId %>">
                         <div class="novel-card">
-                            <div class="novel-image">소설 이미지</div>
+                            <img 
+                                src="<%= novel.coverImageUrl %>" 
+                                alt="<%= novel.title %> 커버 이미지"
+                                class="novel-image-cover"
+                            >
                             <div class="novel-title"><%= novel.title %></div>
                             <div class="novel-author"><%= novel.nickname %></div>
                         </div>
                     </a>
                 <% } %>
-                
             </div>
-
             
+            
+        </div>
     </body>
 </html>

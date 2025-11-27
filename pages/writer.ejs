@@ -1,57 +1,65 @@
-
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= writer.nickname %> 작가 페이지</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= writer.nickname %> 작가 페이지</title>
 
-    <link rel="stylesheet" href="/index.css">
-    <link rel="stylesheet" href="/writer.css" />
-    
-    <script src="/js/user-menu.js"></script>
-</head>
+        <link rel="stylesheet" href="/index.css" />
+        <link rel="stylesheet" href="/writer.css" />
+        <script src="/js/user-menu.js"></script>
+    </head>
 
-<body>
-    <%- include('parts/header') %>
+    <body>
+        <%- include('parts/header') %>
+        <div class="writer-page">
+            
+            <h2 class="writer-title"><%= writer.nickname %> 작가의 작품</h2>
 
-    <div class="writer-page">
+            
+            <div class="writer-bio">
+                <%= writer.bio ? writer.bio : "작가 소개가 아직 없습니다." %>
+            </div>
 
-        <!-- 작가 이름 -->
-        <h2 class="writer-title"><%= writer.nickname %> 작가의 작품</h2>
-
-        <!-- 작가 소개 -->
-        <div class="writer-bio">
-            <%= writer.bio ? writer.bio : "작가 소개가 아직 없습니다." %>
-        </div>
-
-        <!-- 소설 리스트 -->
-        <% writerNovels.forEach(novel => { %>
+            <% writerNovels.forEach(novel => { %>
             <div class="novelintrosection">
-                <div class="novel-image">표지 이미지</div>
-
+                <% if (novel.coverImageUrl) { %>
+                <img
+                    src="<%= novel.coverImageUrl %>"
+                    alt="<%= novel.title %> 표지 이미지"
+                    class="novel-image-thumb"
+                />
+                <% } else { %>
+                <div class="novel-image-thumb no-image">표지 이미지</div>
+                <% } %>
                 <div class="novel-intro">
-
+                    
                     <div class="novel-title">
                         <%= novel.title %>
+                        
                         <span>
+                            
                             <a href="/novel/<%= novel.novelId %>">바로가기</a>
+                            
                         </span>
+                        
                     </div>
 
+                    
                     <div class="novel-author">
                         <%= writer.nickname %>
                     </div>
 
                     <div class="novel-intro">
-                        <%= novel.description ? novel.description : "소개가 없습니다." %>
+                        <%= novel.description ?
+                        novel.description : "소개가 없습니다." %>
                     </div>
 
+                    
                 </div>
+                
             </div>
-        <% }) %>
-
-    </div>
-
-</body>
+            <% }) %>
+        </div>
+    </body>
 </html>

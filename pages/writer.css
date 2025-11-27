@@ -261,3 +261,10 @@ body {
 .hidden {
     display: none;
 }
+
+/* writer.css 파일에 다음 내용이 포함되어야 합니다. (예시) */
+.novel-image-thumb {
+    width: 100px;  /* 원하는 썸네일 너비 */
+    height: 140px; /* 원하는 썸네일 높이 */
+    object-fit: cover; /* 비율 유지하며 꽉 채우기 */
+}

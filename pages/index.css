@@ -163,12 +163,12 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     max-width: 1280px; 
     margin: 40px auto;
-    padding: 0 16px 40px;
+    padding: 0 16px 45px;
 }
 
 /* 개별 카드 스타일 */
 .novel-card {
-    width: 180px;
+    width: 160px;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -183,13 +183,14 @@ body {
 }
 
 /* 이미지 영역 (임시 색상) */
-.novel-image {
+.novel-image-cover {
     background-color: #ccc;
-    height: 200px;
+    height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    object-fit: cover;
 }
 
 /* 제목, 작가 */
