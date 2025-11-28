@@ -8,7 +8,6 @@
         </span>
 
         <% if (user) { %>
-        <!-- 🔥 모달을 열기 위한 버튼 -->
         <div id="userMenuBtn" class="user-menu-btn">
             <%= user.nickname %>님 ▾
         </div>
@@ -18,7 +17,6 @@
     </div>
 </header>
 
-<!-- 🔥 로그인 유저에게만 모달/오버레이 표시 -->
 <% if (user) { %>
 <div id="userMenuOverlay" class="user-menu-overlay hidden"></div>
 
@@ -27,6 +25,10 @@
         <span class="user-menu-name"><%= user.nickname %></span>
     </div>
     <div class="user-menu-body">
+        
+        <% if (user.isAdmin === 1) { %>
+        <a href="/admin" class="user-menu-item admin-link">관리자 페이지</a>
+        <% } %>
         <a href="/mynovel" class="user-menu-item">내 작품</a>
         <a href="/logout" class="user-menu-item logout">로그아웃</a>
     </div>

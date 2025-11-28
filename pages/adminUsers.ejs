@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/adminUsers.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> 
+</head>
+<body>
+    <div class="admin-wrap">
+        <%- include('parts/admin_sidebar', { user: user }) %>
+        
+        <main class="admin-main-content">
+            <h1>👥 사용자 관리</h1>
+            <p>총 **<%= users.length %>명**의 사용자 목록입니다. 관리자 권한을 가진 사용자는 삭제할 수 없습니다.</p>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>닉네임</th>
+                        <th>이메일</th>
+                        <th>권한</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(userItem => { %>
+                        <tr id="user-<%= userItem.id %>">
+                            <td><%= userItem.id %></td>
+                            <td><%= userItem.nickname %></td>
+                            <td><%= userItem.email %></td>
+                            <td>
+                                <span class="badge <%= userItem.isAdmin ? 'badge-admin' : 'badge-user' %>">
+                                    <%= userItem.isAdmin ? '관리자' : '일반' %>
+                                </span>
+                            </td>
+                            <td>
+                                <button 
+                                    class="btn-delete" 
+                                    data-user-id="<%= userItem.id %>"
+                                    data-is-admin="<%= userItem.isAdmin %>"
+                                    <%= userItem.id === user.id || userItem.isAdmin ? 'disabled' : '' %>
+                                >
+                                    삭제
+                                </button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', async function() {
+                const userId = this.dataset.userId;
+                const isAdmin = this.dataset.isAdmin;
+                
+                if (isAdmin === '1') {
+                    alert('관리자 권한을 가진 계정은 삭제할 수 없습니다.');
+                    return;
+                }
+
+                if (confirm(`[${userId}] 사용자를 정말로 삭제하시겠습니까?\n\n경고: 이 사용자가 작성한 모든 작품, 에피소드, 댓글, 좋아요 데이터가 영구적으로 삭제됩니다.`)) {
+                    try {
+                        const response = await axios.post(`/admin/user/delete/${userId}`);
+                        
+                        if (response.data.success) {
+                            alert(response.data.message);
+                            // 성공 시 목록에서 해당 행 제거
+                            document.getElementById(`user-${userId}`).remove();
+                        } else {
+                            alert(`삭제 실패: ${response.data.message}`);
+                        }
+                    } catch (error) {
+                        console.error('삭제 요청 오류:', error);
+                        // HTTP 응답이 400, 500 등 오류일 경우 메시지 출력
+                        alert(error.response.data.message || '삭제 요청 중 서버 오류가 발생했습니다.');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

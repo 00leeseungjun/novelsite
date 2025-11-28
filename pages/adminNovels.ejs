@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/adminUsers.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="admin-wrap">
+        
+        <!-- ✅ 사이드바 수정: user와 currentPage를 전달합니다. -->
+        <%- include('parts/admin_sidebar', { user: user, currentPage: 'novels' }) %>
+        
+        <main class="admin-main-content">
+            <h1>📚 작품 관리</h1>
+            <p>총 **<%= novels.length %>개**의 작품 목록입니다. 문제 발생 시 작품을 강제 삭제할 수 있습니다.</p>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>제목</th>
+                        <th>작가 (닉네임)</th>
+                        <th>장르</th>
+                        <th>상태</th>
+                        <th>좋아요</th>
+                        <!-- <th>등록일</th> <- 이 부분을 제거했습니다. -->
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% novels.forEach(novel => { %>
+                        <tr id="novel-<%= novel.novelId %>">
+                            <!-- ID는 너무 길면 자릅니다 -->
+                            <td><%= novel.novelId.slice(0, 8) %>...</td>
+                            <td><a href="/novel/<%= novel.novelId %>" target="_blank"><%= novel.title %></a></td>
+                            <td><%= novel.nickname %></td>
+                            <td><%= novel.genre %></td>
+                            <td>
+                                <!-- 상태에 따라 배지 스타일을 적용할 수 있습니다. -->
+                                <span class="badge badge-status">
+                                    <%= novel.status %>
+                                </span>
+                            </td>
+                            <td><%= novel.likes %></td>
+                            <!-- 등록일 관련 <td> 부분을 제거했습니다. -->
+                            <td>
+                                <a href="/editnovel?novel=<%= novel.novelId %>" class="btn-edit">수정</a>
+                                <button 
+                                    class="btn-delete-novel btn-delete" 
+                                    data-novel-id="<%= novel.novelId %>"
+                                >
+                                    삭제
+                                </button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        document.querySelectorAll('.btn-delete-novel').forEach(button => {
+            button.addEventListener('click', async function() {
+                const novelId = this.dataset.novelId;
+
+                // confirm() 대신 사용자 정의 모달을 사용해야 하지만, 일단 기본 confirm() 유지
+                if (confirm(`[${novelId.slice(0, 8)}...] 작품을 정말로 삭제하시겠습니까?\n\n경고: 모든 회차, 댓글, 좋아요가 영구적으로 삭제됩니다.`)) {
+                    try {
+                        const response = await axios.post(`/admin/novel/delete/${novelId}`);
+                        
+                        if (response.data.success) {
+                            alert(response.data.message);
+                            document.getElementById(`novel-${novelId}`).remove();
+                        } else {
+                            alert(`삭제 실패: ${response.data.message}`);
+                        }
+                    } catch (error) {
+                        console.error('삭제 요청 오류:', error);
+                        // 오류 응답이 있을 경우 메시지를 표시합니다.
+                        alert(error.response.data.message || '삭제 요청 중 서버 오류가 발생했습니다.');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

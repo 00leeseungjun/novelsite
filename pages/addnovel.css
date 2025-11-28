@@ -45,6 +45,7 @@
     background: #fafafa;
     outline: none;
     transition: 0.15s ease;
+    box-sizing: border-box;
 }
 
 .form-group input:focus,

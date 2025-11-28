@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/adminDashboard.css">
+</head>
+<body>
+    <div class="admin-wrap">
+        
+        <!-- 사이드바 포함: user 객체와 현재 페이지('dashboard') 정보를 전달합니다. -->
+        <%- include('parts/admin_sidebar', { user: user, currentPage: 'dashboard' }) %>
+        
+        <main class="admin-main-content">
+            <h1>📊 <%= title %></h1>
+            <p>환영합니다, <%= user.nickname %> 관리자님. 사이트의 전반적인 현황을 확인하세요.</p>
+            
+            <!-- 통계 카드 섹션 -->
+            <section class="stats-cards">
+                
+                <!-- 총 사용자 수 카드 -->
+                <div class="stat-card users">
+                    <div class="card-icon">👥</div>
+                    <div class="card-info">
+                        <h3>총 사용자 수</h3>
+                        <p class="stat-value"><%= stats.totalUsers.toLocaleString() %> 명</p>
+                    </div>
+                </div>
+
+                <!-- 총 작품 수 카드 -->
+                <div class="stat-card novels">
+                    <div class="card-icon">📚</div>
+                    <div class="card-info">
+                        <h3>총 작품 수</h3>
+                        <p class="stat-value"><%= stats.totalNovels.toLocaleString() %> 개</p>
+                    </div>
+                </div>
+                
+            </section>
+            
+            <!-- 빠른 이동 섹션 -->
+            <section class="quick-links">
+                <h2>바로가기</h2>
+                <div class="link-grid">
+                    <a href="/admin/users" class="quick-link user-management">
+                        <h3>사용자 관리</h3>
+                        <p>사용자 목록 조회 및 계정 삭제 (총 <%= stats.totalUsers %>명)</p>
+                    </a>
+                    <a href="/admin/novels" class="quick-link novel-management">
+                        <h3>작품 관리</h3>
+                        <p>작품 목록 조회 및 삭제 (총 <%= stats.totalNovels %>개)</p>
+                    </a>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

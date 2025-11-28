@@ -18,7 +18,6 @@ const dbConfig = {
     queueLimit: 0,
 };
 
-
 // const dbConfig = {
 //     host: "novel-site-db.cfsq62iae7qt.ap-southeast-2.rds.amazonaws.com", // 보통 'localhost' 또는 DB 서버 주소
 //     user: "admin", // MySQL 설치 시 설정한 사용자 이름
@@ -28,7 +27,6 @@ const dbConfig = {
 //     connectionLimit: 10,
 //     queueLimit: 0,
 // };
-
 
 // Connection Pool 생성
 const db = mysql.createPool(dbConfig);
@@ -70,7 +68,6 @@ const storage = multer.diskStorage({
     },
 });
 const upload = multer({ storage: storage });
-
 
 // 🔥 세션 미들웨어 (무조건 req.session 쓰는 것들보다 위에 있어야 함)
 app.use(
@@ -128,9 +125,9 @@ app.post("/login", async (req, res) => {
 
     // -------------------- 🔥 DB 쿼리 시작 --------------------
     try {
-        // 1. ID로 사용자 찾기 (패스워드와 닉네임만 가져옵니다)
+        // 1. ID로 사용자 찾기 (패스워드, 닉네임, isAdmin을 가져옵니다) 🔥 이 부분을 수정!
         const [users] = await db.query(
-            "SELECT id, password, nickname FROM users WHERE id = ?",
+            "SELECT id, password, nickname, isAdmin FROM users WHERE id = ?",
             [id]
         );
 
@@ -149,6 +146,7 @@ app.post("/login", async (req, res) => {
         req.session.user = {
             id: user.id,
             nickname: user.nickname,
+            isAdmin: user.isAdmin, // ✅ 관리자 여부 필드 추가
         };
 
         res.redirect("/main");
@@ -165,38 +163,58 @@ app.get("/signup", (req, res) => {
 });
 
 // 회원가입 처리
+const saltRounds = 10; // bcrypt 해싱 복잡도
+
 app.post("/signup", async (req, res) => {
     const { id, email, password, nickname } = req.body;
+
+    // ✅ 1. 필수 값 누락 검증 (가장 중요한 수정)
+    if (!id || !email || !password || !nickname) {
+        return res.status(400).send("모든 필수 정보를 입력해 주세요. (아이디, 이메일, 비밀번호, 닉네임)");
+    }
+    
     // -------------------- 🔥 DB 쿼리 시작 --------------------
     try {
-        // 1. ID 중복 확인
+        // 2. ID, EMAIL, NICKNAME 중복 확인 (SELECT에 email, nickname 필드를 추가하여 비교 가능하게 수정)
         const [existingUsers] = await db.query(
-            "SELECT id FROM users WHERE id = ? OR email = ? OR nickname = ?",
+            "SELECT id, email, nickname FROM users WHERE id = ? OR email = ? OR nickname = ?",
             [id, email, nickname]
         );
+
         if (existingUsers.length > 0) {
             const exists = existingUsers[0];
+            // 중복된 값을 정확히 찾아서 사용자에게 오류 메시지를 반환합니다.
             if (exists.id === id) {
                 return res.status(400).send("이미 사용중인 아이디입니다.");
-            } else if (exists.email === email) {
+            }
+            if (exists.email === email) { // 이제 exists 객체에 email 필드가 있어 비교 가능합니다.
                 return res.status(400).send("이미 사용중인 이메일입니다.");
-            } else if (exists.nickname === nickname) {
+            }
+            if (exists.nickname === nickname) { // 이제 exists 객체에 nickname 필드가 있어 비교 가능합니다.
                 return res.status(400).send("이미 사용중인 닉네임입니다.");
             }
         }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        // 2. 새 사용자 DB에 삽입
+        
+        // 3. 비밀번호 해싱
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        
+        // 4. 새 사용자 DB에 삽입
         await db.query(
-            "INSERT INTO users (id, email, password, nickname) VALUES (?, ?, ?, ?)",
-            [id, email, hashedPassword, nickname]
+            "INSERT INTO users (id, email, password, nickname, isAdmin) VALUES (?, ?, ?, ?, ?)",
+            [id, email, hashedPassword, nickname, 0]
         );
-        res.send("회원가입 성공!");
+        
+        // 5. ✅ 성공 후 응답 수정: res.send()를 제거하고 리다이렉트만 실행
+        // res.send("회원가입 성공!"); // 이 응답 때문에 아래 res.redirect가 무시되었습니다.
+        res.redirect("/main"); 
+
     } catch (error) {
         console.error("회원가입 DB 오류:", error);
         res.status(500).send("회원가입 중 서버 오류가 발생했습니다.");
     }
     // -------------------- 🔥 DB 쿼리 끝 --------------------
 });
+
 
 // 로그아웃
 app.get("/logout", (req, res) => {
@@ -293,7 +311,8 @@ app.get("/mynovel", requireLogin, async (req, res) => {
     }
 });
 
-app.get("/writer/:userId", async (req, res) => { // ⭐ async 추가
+app.get("/writer/:userId", async (req, res) => {
+    // ⭐ async 추가
     const userId = req.params.userId;
 
     try {
@@ -305,7 +324,10 @@ app.get("/writer/:userId", async (req, res) => { // ⭐ async 추가
 
         if (writerNovels.length === 0) {
             // 작가 닉네임을 찾기 위해 users 테이블에서 한 번 더 조회
-            const [userRow] = await db.query("SELECT nickname FROM users WHERE id = ?", [userId]);
+            const [userRow] = await db.query(
+                "SELECT nickname FROM users WHERE id = ?",
+                [userId]
+            );
             if (userRow.length === 0) {
                 return res.status(404).send("해당 작가를 찾을 수 없습니다.");
             }
@@ -324,7 +346,6 @@ app.get("/writer/:userId", async (req, res) => { // ⭐ async 추가
             writer,
             writerNovels,
         });
-
     } catch (error) {
         console.error("작가 페이지 DB 오류:", error);
         res.status(500).send("작가 페이지 로딩 중 서버 오류가 발생했습니다.");
@@ -886,7 +907,8 @@ app.get("/search", async (req, res) => {
 
 // 댓글 목록 + 입력 페이지
 // 댓글 목록 + 입력 페이지
-app.get("/novel/:novelId/:episodeNumber/comments", async (req, res) => { // ⭐ async 추가
+app.get("/novel/:novelId/:episodeNumber/comments", async (req, res) => {
+    // ⭐ async 추가
     const { novelId } = req.params;
     const episodeNumber = Number(req.params.episodeNumber);
 
@@ -897,7 +919,8 @@ app.get("/novel/:novelId/:episodeNumber/comments", async (req, res) => { // ⭐ 
             [novelId]
         );
         const novel = novelRows[0];
-        if (!novel) return res.status(404).send("해당 소설을 찾을 수 없습니다.");
+        if (!novel)
+            return res.status(404).send("해당 소설을 찾을 수 없습니다.");
 
         // 2. 회차 정보 조회
         const [episodeRows] = await db.query(
@@ -905,7 +928,8 @@ app.get("/novel/:novelId/:episodeNumber/comments", async (req, res) => { // ⭐ 
             [novelId, episodeNumber]
         );
         const episode = episodeRows[0];
-        if (!episode) return res.status(404).send("해당 회차를 찾을 수 없습니다.");
+        if (!episode)
+            return res.status(404).send("해당 회차를 찾을 수 없습니다.");
 
         // 3. 해당 회차 댓글 조회 (작성 시간 순 오름차순)
         const [episodeComments] = await db.query(
@@ -921,7 +945,6 @@ app.get("/novel/:novelId/:episodeNumber/comments", async (req, res) => { // ⭐ 
             comments: episodeComments,
             user: req.session.user,
         });
-
     } catch (error) {
         console.error("댓글 목록 DB 오류:", error);
         res.status(500).send("댓글 목록 로딩 중 서버 오류가 발생했습니다.");
@@ -929,10 +952,11 @@ app.get("/novel/:novelId/:episodeNumber/comments", async (req, res) => { // ⭐ 
 });
 ///////////좋아요 코드
 
-app.post("/like", requireLogin, async (req, res) => { // ⭐ async 추가
+app.post("/like", requireLogin, async (req, res) => {
+    // ⭐ async 추가
     const { novelId } = req.body;
     const currentUserId = req.session.user.id;
-    
+
     // 트랜잭션 시작 (좋아요 추가/삭제 및 카운트 업데이트를 안전하게 처리)
     const connection = await db.getConnection();
     try {
@@ -981,15 +1005,13 @@ app.post("/like", requireLogin, async (req, res) => { // ⭐ async 추가
         newLikesCount = novelUpdateRows[0].likes;
 
         await connection.commit();
-        
+
         // 최종 결과 전송
         res.json({ liked: likedStatus, likes: newLikesCount });
-
     } catch (error) {
         await connection.rollback();
         console.error("좋아요 DB 오류:", error);
         res.status(500).json({ error: "좋아요 처리 중 서버 오류 발생" });
-
     } finally {
         connection.release();
     }
@@ -997,38 +1019,311 @@ app.post("/like", requireLogin, async (req, res) => { // ⭐ async 추가
 
 // 댓글 작성
 // 댓글 작성
-app.post("/novel/:novelId/:episodeNumber/comment", requireLogin, async (req, res) => { // ⭐ async 추가
-    const { novelId } = req.params;
-    const episodeNumber = Number(req.params.episodeNumber);
-    const { content } = req.body;
+app.post(
+    "/novel/:novelId/:episodeNumber/comment",
+    requireLogin,
+    async (req, res) => {
+        // ⭐ async 추가
+        const { novelId } = req.params;
+        const episodeNumber = Number(req.params.episodeNumber);
+        const { content } = req.body;
 
-    // 댓글 테이블 정의에 맞게 현재 시간 포맷
-    const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
-    const newCommentId = uuid.v4();
-    const currentUserId = req.session.user.id;
-    const currentUserNickname = req.session.user.nickname;
+        // 댓글 테이블 정의에 맞게 현재 시간 포맷
+        const timestamp = new Date()
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+        const newCommentId = uuid.v4();
+        const currentUserId = req.session.user.id;
+        const currentUserNickname = req.session.user.nickname;
 
-    try {
-        // 1. 댓글을 comments 테이블에 삽입
-        await db.query(
-            `INSERT INTO comments 
+        try {
+            // 1. 댓글을 comments 테이블에 삽입
+            await db.query(
+                `INSERT INTO comments 
             (id, novelId, episodeNumber, userId, nickname, content, likes, parentId, createdAt) 
             VALUES (?, ?, ?, ?, ?, ?, 0, NULL, ?)`,
-            [
-                newCommentId,
-                novelId,
-                episodeNumber,
-                currentUserId,
-                currentUserNickname,
-                content.trim(),
-                timestamp,
-            ]
+                [
+                    newCommentId,
+                    novelId,
+                    episodeNumber,
+                    currentUserId,
+                    currentUserNickname,
+                    content.trim(),
+                    timestamp,
+                ]
+            );
+
+            res.redirect(
+                `/novel/${novelId}/${episodeNumber}/comments#comments`
+            );
+        } catch (error) {
+            console.error("댓글 작성 DB 오류:", error);
+            res.status(500).send("댓글 작성 중 서버 오류가 발생했습니다.");
+        }
+    }
+);
+
+/* -------------------- 6. 관리자 기능 관련 라우트 -------------------- */
+
+// 🔥 관리자 권한 체크 미들웨어 (Admin Router에만 사용)
+// function isAdmin(req, res, next) {
+//     // 1. 로그인 확인
+//     if (!req.session.user) {
+//         // req.session.user가 null이므로 req.session.user.isAdmin에 접근하면 에러 발생
+//         return res.status(401).send("로그인 후 접근해주세요.");
+//     }
+
+//     // 2. 관리자 권한 확인 (세션에 저장된 isAdmin 필드 사용)
+//     // MySQL의 tinyint(1)은 1이 TRUE, 0이 FALSE입니다.
+//     if (req.session.user.isAdmin === 1) {
+//         next(); // 통과
+//     } else {
+//         // 403 Forbidden
+//         res.status(403).send("❌ 관리자만 접근 가능합니다. 권한이 없습니다.");
+//     }
+// }
+
+// 🔥 관리자 권한 체크 미들웨어 (Admin Router에만 사용)
+function isAdmin(req, res, next) {
+    // 1. 로그인 확인 및 user 객체 안전성 체크
+    if (!req.session.user || !req.session.user.id) {
+        // req.session.user가 null이거나 id가 없으면 로그인 페이지로 안내
+        return res.redirect("/login"); 
+    }
+
+    // 2. 관리자 권한 확인 (isAdmin이 1인지 명확히 확인)
+    if (req.session.user.isAdmin === 1) {
+        next(); // 통과
+    } else {
+        // 403 Forbidden
+        res.status(403).send("❌ 관리자만 접근 가능합니다. 권한이 없습니다.");
+    }
+}
+
+// A. 관리자 대시보드 (GET /admin)
+app.get("/admin", isAdmin, async (req, res) => {
+    try {
+        // 대시보드 통계 데이터 로드
+        const [totalUsersResult] = await db.query(
+            "SELECT COUNT(*) AS count FROM users"
+        );
+        const [totalNovelsResult] = await db.query(
+            "SELECT COUNT(*) AS count FROM novels"
         );
 
-        res.redirect(`/novel/${novelId}/${episodeNumber}/comments#comments`);
+        const stats = {
+            totalUsers: totalUsersResult[0].count,
+            totalNovels: totalNovelsResult[0].count,
+        };
+
+        // TODO: 실제 EJS 파일명에 맞게 변경 (예: adminDashboard.ejs)
+        res.render("adminDashboard", {
+            title: "관리자 대시보드",
+            user: req.session.user, // ✅ user 객체 추가
+            stats: stats,
+        });
     } catch (error) {
-        console.error("댓글 작성 DB 오류:", error);
-        res.status(500).send("댓글 작성 중 서버 오류가 발생했습니다.");
+        console.error("관리자 대시보드 로드 오류:", error);
+        res.status(500).send("서버 오류 발생");
+    }
+});
+
+// B. 사용자 목록 페이지 (GET /admin/users)
+app.get("/admin/users", isAdmin, async (req, res) => {
+    try {
+        // 비밀번호를 제외한 사용자 정보 조회
+        const [users] = await db.query(
+            "SELECT id, email, nickname, isAdmin FROM users ORDER BY id ASC"
+        );
+
+        // TODO: 실제 EJS 파일명에 맞게 변경 (예: adminUsers.ejs)
+        res.render("adminUsers", {
+            title: "사용자 관리",
+            user: req.session.user, // ✅ user 객체 추가
+            users: users,
+        });
+    } catch (error) {
+        console.error("사용자 목록 로드 오류:", error);
+        res.status(500).send("서버 오류 발생");
+    }
+});
+
+// C. 사용자 삭제 기능 (POST /admin/user/delete/:id) 🔥 실무 필수 기능
+app.post("/admin/user/delete/:id", isAdmin, async (req, res) => {
+    const userIdToDelete = req.params.id;
+    const currentUserId = req.session.user.id;
+
+    // 🔥 관리자 본인 계정 삭제 방지 로직
+    if (userIdToDelete === currentUserId) {
+        return res
+            .status(400)
+            .json({
+                success: false,
+                message: "본인 계정은 삭제할 수 없습니다.",
+            });
+    }
+
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // 1. 소설 확인 (해당 사용자가 작성한 소설이 있는지 확인)
+        const [novelsResult] = await connection.query(
+            "SELECT novelId FROM novels WHERE userId = ?",
+            [userIdToDelete]
+        );
+
+        // 2. 외래키 연결된 소설 관련 데이터 (comments, episodes, likes) 삭제
+        for (const novel of novelsResult) {
+            await connection.query("DELETE FROM comments WHERE novelId = ?", [
+                novel.novelId,
+            ]);
+            await connection.query("DELETE FROM episodes WHERE novelId = ?", [
+                novel.novelId,
+            ]);
+            await connection.query("DELETE FROM likes WHERE novelId = ?", [
+                novel.novelId,
+            ]);
+        }
+
+        // 3. 사용자가 작성한 소설 삭제
+        await connection.query("DELETE FROM novels WHERE userId = ?", [
+            userIdToDelete,
+        ]);
+
+        // 4. 사용자가 남긴 댓글 및 좋아요 삭제
+        await connection.query("DELETE FROM comments WHERE userId = ?", [
+            userIdToDelete,
+        ]);
+        await connection.query("DELETE FROM likes WHERE userId = ?", [
+            userIdToDelete,
+        ]);
+
+        // 5. 최종적으로 사용자 삭제
+        const [result] = await connection.query(
+            "DELETE FROM users WHERE id = ?",
+            [userIdToDelete]
+        );
+
+        await connection.commit();
+
+        if (result.affectedRows === 0) {
+            return res
+                .status(404)
+                .json({
+                    success: false,
+                    message: "사용자를 찾을 수 없습니다.",
+                });
+        }
+
+        res.json({
+            success: true,
+            message: "사용자가 성공적으로 삭제되었습니다.",
+        });
+    } catch (error) {
+        await connection.rollback();
+        console.error("사용자 삭제 오류:", error);
+        res.status(500).json({
+            success: false,
+            message: "서버 오류로 사용자 삭제에 실패했습니다.",
+        });
+    } finally {
+        connection.release();
+    }
+});
+
+// D. 작품 목록 페이지 (GET /admin/novels)
+app.get("/admin/novels", isAdmin, async (req, res) => {
+    try {
+        // 작품 목록과 작성자 정보를 함께 로드
+        const [novels] = await db.query(
+            "SELECT novelId, title, nickname, genre, status, likes FROM novels ORDER BY novelId ASC"
+        );
+
+        // TODO: 실제 EJS 파일명에 맞게 변경 (예: adminNovels.ejs)
+        res.render("adminNovels", {
+            title: "작품 관리",
+            user: req.session.user, // ✅ user 객체 추가
+            novels: novels,
+        });
+    } catch (error) {
+        console.error("작품 목록 로드 오류:", error);
+        res.status(500).send("서버 오류 발생");
+    }
+});
+
+// E. 작품 삭제 기능 (POST /admin/novel/delete/:id) 🔥 실무 필수 기능
+app.post("/admin/novel/delete/:id", isAdmin, async (req, res) => {
+    const novelIdToDelete = req.params.id;
+
+    // 트랜잭션 및 외래키 처리 시작
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        // 1. 파일 시스템에서 이미지 삭제를 위한 coverImageUrl 조회
+        const [novelRows] = await connection.query(
+            "SELECT coverImageUrl FROM novels WHERE novelId = ?",
+            [novelIdToDelete]
+        );
+        const coverImageUrl =
+            novelRows.length > 0 ? novelRows[0].coverImageUrl : null;
+
+        // 2. DB에서 연결된 데이터 삭제 (외래키 제약 조건을 고려하여 순서대로)
+        await connection.query("DELETE FROM comments WHERE novelId = ?", [
+            novelIdToDelete,
+        ]);
+        await connection.query("DELETE FROM episodes WHERE novelId = ?", [
+            novelIdToDelete,
+        ]);
+        await connection.query("DELETE FROM likes WHERE novelId = ?", [
+            novelIdToDelete,
+        ]);
+
+        // 3. 최종적으로 작품 삭제
+        const [result] = await connection.query(
+            "DELETE FROM novels WHERE novelId = ?",
+            [novelIdToDelete]
+        );
+
+        await connection.commit();
+
+        if (result.affectedRows === 0) {
+            return res
+                .status(404)
+                .json({ success: false, message: "작품을 찾을 수 없습니다." });
+        }
+
+        // 4. 파일 시스템에서 이미지 삭제 (DB 처리 후 진행)
+        if (coverImageUrl && !coverImageUrl.includes("placehold.co")) {
+            const UPLOADS_DIR = path.join(__dirname, "pages", "uploads");
+            const oldFileName = path.basename(coverImageUrl);
+            const oldFilePath = path.join(UPLOADS_DIR, oldFileName);
+            if (fs.existsSync(oldFilePath)) {
+                fs.unlink(oldFilePath, (err) => {
+                    if (err)
+                        console.error(
+                            `관리자 작품 삭제 후 이미지 파일 정리 실패: ${oldFilePath}`,
+                            err
+                        );
+                });
+            }
+        }
+
+        res.json({
+            success: true,
+            message: "작품이 성공적으로 삭제되었습니다.",
+        });
+    } catch (error) {
+        await connection.rollback();
+        console.error("작품 삭제 오류:", error);
+        res.status(500).json({
+            success: false,
+            message: "서버 오류로 작품 삭제에 실패했습니다.",
+        });
+    } finally {
+        connection.release();
     }
 });
 
